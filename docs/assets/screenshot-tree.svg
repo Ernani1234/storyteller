@@ -1,0 +1,101 @@
+<svg width="1100" height="700" viewBox="0 0 1100 700" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Storyteller — story tree view">
+  <defs>
+    <filter id="win" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="14" stdDeviation="22" flood-color="#A78BDA" flood-opacity="0.30"/>
+    </filter>
+    <filter id="card" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="5" stdDeviation="9" flood-color="#A78BDA" flood-opacity="0.22"/>
+    </filter>
+    <style>
+      .t{font-family:Segoe UI,Helvetica,Arial,sans-serif}
+      .nt{font-weight:700;font-size:15px;fill:#3B3450}
+      .ns{font-size:12px;fill:#7C748F}
+    </style>
+  </defs>
+
+  <rect width="1100" height="700" fill="#EFE8FB"/>
+
+  <!-- window -->
+  <g filter="url(#win)">
+    <rect x="30" y="24" width="1040" height="652" rx="18" fill="#FBF7FF"/>
+
+    <!-- title bar -->
+    <rect x="30" y="24" width="1040" height="40" rx="18" fill="#FFFFFF"/>
+    <rect x="30" y="44" width="1040" height="20" fill="#FFFFFF"/>
+    <circle cx="54" cy="44" r="6" fill="#F0A4A4"/>
+    <circle cx="74" cy="44" r="6" fill="#F5D58A"/>
+    <circle cx="94" cy="44" r="6" fill="#A9DDB8"/>
+    <text x="550" y="49" text-anchor="middle" class="t" font-size="13" fill="#9A91AE">Storyteller</text>
+
+    <!-- top bar -->
+    <rect x="30" y="64" width="1040" height="60" fill="#FFFFFF"/>
+    <line x1="30" y1="124" x2="1070" y2="124" stroke="#ECE3FA"/>
+    <text x="58" y="100" class="t" font-size="18" font-weight="800" fill="#A78BDA">✦</text>
+    <text x="80" y="100" class="t" font-size="17" font-weight="700" fill="#3B3450">Storyteller</text>
+
+    <!-- search pill -->
+    <rect x="330" y="78" width="360" height="34" rx="17" fill="#FBF7FF" stroke="#ECE3FA"/>
+    <text x="350" y="100" class="t" font-size="13" fill="#3B3450">The Last of Us</text>
+    <rect x="700" y="78" width="120" height="34" rx="17" fill="#A78BDA"/>
+    <text x="760" y="100" text-anchor="middle" class="t" font-size="13" font-weight="600" fill="#fff">Tell the story</text>
+    <circle cx="1030" cy="95" r="17" fill="#FBF7FF" stroke="#ECE3FA"/>
+    <text x="1030" y="100" text-anchor="middle" class="t" font-size="14" fill="#7C748F">⚙</text>
+
+    <!-- canvas header -->
+    <text x="58" y="158" class="t" font-size="21" font-weight="800" fill="#3B3450">The Last of Us</text>
+    <rect x="250" y="142" width="92" height="22" rx="11" fill="#EBE2FB"/>
+    <text x="296" y="158" text-anchor="middle" class="t" font-size="12" font-weight="600" fill="#A78BDA">video game</text>
+    <text x="58" y="180" class="t" font-size="13" fill="#7C748F">A smuggler escorts an immune girl across a ravaged, infected America.</text>
+
+    <!-- dotted background -->
+    <g fill="#CDBDF0" opacity="0.5">
+      <!-- a sparse dot grid -->
+      <g>
+        <circle cx="120" cy="240" r="1.4"/><circle cx="200" cy="240" r="1.4"/><circle cx="280" cy="240" r="1.4"/><circle cx="360" cy="240" r="1.4"/><circle cx="440" cy="240" r="1.4"/><circle cx="520" cy="240" r="1.4"/><circle cx="600" cy="240" r="1.4"/><circle cx="680" cy="240" r="1.4"/><circle cx="760" cy="240" r="1.4"/><circle cx="840" cy="240" r="1.4"/><circle cx="920" cy="240" r="1.4"/>
+        <circle cx="120" cy="360" r="1.4"/><circle cx="200" cy="360" r="1.4"/><circle cx="280" cy="360" r="1.4"/><circle cx="360" cy="360" r="1.4"/><circle cx="440" cy="360" r="1.4"/><circle cx="520" cy="360" r="1.4"/><circle cx="600" cy="360" r="1.4"/><circle cx="680" cy="360" r="1.4"/><circle cx="760" cy="360" r="1.4"/><circle cx="840" cy="360" r="1.4"/><circle cx="920" cy="360" r="1.4"/>
+        <circle cx="120" cy="480" r="1.4"/><circle cx="200" cy="480" r="1.4"/><circle cx="280" cy="480" r="1.4"/><circle cx="360" cy="480" r="1.4"/><circle cx="440" cy="480" r="1.4"/><circle cx="520" cy="480" r="1.4"/><circle cx="600" cy="480" r="1.4"/><circle cx="680" cy="480" r="1.4"/><circle cx="760" cy="480" r="1.4"/><circle cx="840" cy="480" r="1.4"/><circle cx="920" cy="480" r="1.4"/>
+      </g>
+    </g>
+
+    <!-- edges -->
+    <g stroke="#CDBDF0" stroke-width="2" fill="none">
+      <path d="M560 268 C560 300 560 300 560 332"/>
+      <path d="M560 400 C560 432 560 432 560 464"/>
+      <path d="M560 400 C380 432 350 432 320 464"/>
+    </g>
+
+    <!-- node 1 (active) -->
+    <g filter="url(#card)">
+      <rect x="455" y="208" width="210" height="60" rx="14" fill="#F3ECFF" stroke="#A78BDA" stroke-width="2"/>
+    </g>
+    <circle cx="476" cy="228" r="11" fill="#EBE2FB"/><text x="476" y="232" text-anchor="middle" class="t" font-size="11" font-weight="700" fill="#A78BDA">1</text>
+    <text x="494" y="232" class="nt">Outbreak Day</text>
+    <text x="471" y="252" class="ns">Civilization collapses as the Cordyceps…</text>
+
+    <!-- node 2 -->
+    <g filter="url(#card)"><rect x="455" y="340" width="210" height="60" rx="14" fill="#fff" stroke="#ECE3FA"/></g>
+    <circle cx="476" cy="360" r="11" fill="#EBE2FB"/><text x="476" y="364" text-anchor="middle" class="t" font-size="11" font-weight="700" fill="#A78BDA">2</text>
+    <text x="494" y="364" class="nt">Twenty Years Later</text>
+    <text x="471" y="384" class="ns">Joel smuggles supplies in a QZ…</text>
+
+    <!-- node 3 -->
+    <g filter="url(#card)"><rect x="455" y="472" width="210" height="60" rx="14" fill="#fff" stroke="#ECE3FA"/></g>
+    <circle cx="476" cy="492" r="11" fill="#EBE2FB"/><text x="476" y="496" text-anchor="middle" class="t" font-size="11" font-weight="700" fill="#A78BDA">3</text>
+    <text x="494" y="496" class="nt">The Cargo</text>
+    <text x="471" y="516" class="ns">Joel is tasked to escort Ellie…</text>
+
+    <!-- node 3b (branch) -->
+    <g filter="url(#card)"><rect x="215" y="472" width="210" height="60" rx="14" fill="#fff" stroke="#ECE3FA"/></g>
+    <circle cx="236" cy="492" r="11" fill="#EBE2FB"/><text x="236" y="496" text-anchor="middle" class="t" font-size="11" font-weight="700" fill="#A78BDA">4</text>
+    <text x="254" y="496" class="nt">Bill's Town</text>
+    <text x="231" y="516" class="ns">A detour for a working vehicle…</text>
+
+    <!-- mini controls -->
+    <g>
+      <rect x="58" y="600" width="34" height="58" rx="8" fill="#fff" stroke="#ECE3FA"/>
+      <text x="75" y="624" text-anchor="middle" class="t" font-size="15" fill="#7C748F">+</text>
+      <line x1="64" y1="630" x2="86" y2="630" stroke="#ECE3FA"/>
+      <text x="75" y="650" text-anchor="middle" class="t" font-size="15" fill="#7C748F">−</text>
+    </g>
+  </g>
+</svg>

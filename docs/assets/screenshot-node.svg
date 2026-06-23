@@ -1,0 +1,95 @@
+<svg width="1100" height="700" viewBox="0 0 1100 700" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Storyteller — chapter panel with Q&amp;A">
+  <defs>
+    <filter id="win2" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="14" stdDeviation="22" flood-color="#A78BDA" flood-opacity="0.30"/>
+    </filter>
+    <linearGradient id="img1" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#C8B6F0"/><stop offset="1" stop-color="#A8D8EA"/></linearGradient>
+    <linearGradient id="img2" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFD8A8"/><stop offset="1" stop-color="#FFB7C5"/></linearGradient>
+    <style>
+      .t{font-family:Segoe UI,Helvetica,Arial,sans-serif}
+      .body{font-size:13px;fill:#3B3450}
+    </style>
+  </defs>
+
+  <rect width="1100" height="700" fill="#EFE8FB"/>
+
+  <g filter="url(#win2)">
+    <rect x="30" y="24" width="1040" height="652" rx="18" fill="#FBF7FF"/>
+    <rect x="30" y="24" width="1040" height="40" rx="18" fill="#FFFFFF"/>
+    <rect x="30" y="44" width="1040" height="20" fill="#FFFFFF"/>
+    <circle cx="54" cy="44" r="6" fill="#F0A4A4"/><circle cx="74" cy="44" r="6" fill="#F5D58A"/><circle cx="94" cy="44" r="6" fill="#A9DDB8"/>
+
+    <!-- left: faded tree with a BLINKING related node -->
+    <rect x="30" y="64" width="610" height="612" fill="#FBF7FF"/>
+    <g opacity="0.85">
+      <g stroke="#CDBDF0" stroke-width="2" fill="none">
+        <path d="M300 150 L300 230"/><path d="M300 310 L300 390"/>
+      </g>
+      <rect x="205" y="120" width="190" height="56" rx="13" fill="#fff" stroke="#ECE3FA"/>
+      <text x="225" y="146" class="t" font-size="14" font-weight="700" fill="#3B3450">Twenty Years Later</text>
+      <text x="225" y="165" class="t" font-size="11" fill="#7C748F">Joel smuggles in the QZ…</text>
+
+      <!-- active -->
+      <rect x="205" y="280" width="190" height="56" rx="13" fill="#F3ECFF" stroke="#A78BDA" stroke-width="2"/>
+      <text x="225" y="306" class="t" font-size="14" font-weight="700" fill="#3B3450">The Cargo</text>
+      <text x="225" y="325" class="t" font-size="11" fill="#7C748F">Escort Ellie out of the QZ…</text>
+
+      <!-- blinking related node -->
+      <rect x="205" y="440" width="190" height="56" rx="13" fill="#fff" stroke="#A78BDA" stroke-width="3"/>
+      <rect x="200" y="435" width="200" height="66" rx="16" fill="none" stroke="#A78BDA" stroke-width="2" opacity="0.45"/>
+      <text x="225" y="466" class="t" font-size="14" font-weight="700" fill="#3B3450">The Fireflies</text>
+      <text x="225" y="485" class="t" font-size="11" fill="#7C748F">The cure, and Joel's choice…</text>
+      <text x="225" y="520" class="t" font-size="11" font-style="italic" fill="#A78BDA">↑ pulsing — related to your question</text>
+    </g>
+
+    <!-- right: detail panel -->
+    <rect x="640" y="64" width="430" height="612" fill="#FFFFFFF2"/>
+    <line x1="640" y1="64" x2="640" y2="676" stroke="#ECE3FA"/>
+    <text x="664" y="100" class="t" font-size="18" font-weight="800" fill="#3B3450">The Cargo</text>
+    <text x="1040" y="100" text-anchor="end" class="t" font-size="14" fill="#7C748F">✕</text>
+    <line x1="640" y1="118" x2="1070" y2="118" stroke="#ECE3FA"/>
+
+    <!-- gallery -->
+    <rect x="664" y="134" width="190" height="96" rx="10" fill="url(#img1)"/>
+    <rect x="862" y="134" width="184" height="96" rx="10" fill="url(#img2)"/>
+    <text x="676" y="222" class="t" font-size="10" fill="#fff">Quarantine Zone</text>
+    <text x="874" y="222" class="t" font-size="10" fill="#5A3F37">Ellie</text>
+
+    <!-- prose with highlight -->
+    <g class="t body">
+      <text x="664" y="258">Joel and Tess agree to smuggle a teenage girl,</text>
+      <text x="664" y="278">Ellie, out of the zone in exchange for weapons.</text>
+      <text x="664" y="298">What seems like a simple job changes when</text>
+    </g>
+    <!-- highlighted line -->
+    <rect x="660" y="306" width="392" height="22" rx="5" fill="#EBE2FB" stroke="#A78BDA"/>
+    <text x="664" y="322" class="t body">they learn Ellie is immune to the infection.</text>
+    <g class="t body">
+      <text x="664" y="348">Her bite never turned — she may hold the cure.</text>
+    </g>
+
+    <!-- key moments box -->
+    <rect x="664" y="368" width="382" height="74" rx="10" fill="#FBF7FF" stroke="#ECE3FA"/>
+    <text x="680" y="390" class="t" font-size="12" font-weight="700" fill="#A78BDA">Key moments</text>
+    <text x="680" y="410" class="t" font-size="11" fill="#3B3450">•  The smuggling deal is struck</text>
+    <text x="680" y="428" class="t" font-size="11" fill="#3B3450">•  Ellie's immunity is revealed</text>
+
+    <!-- ask box -->
+    <line x1="664" y1="466" x2="1046" y2="466" stroke="#ECE3FA" stroke-dasharray="4 4"/>
+    <text x="664" y="492" class="t" font-size="13" font-weight="700" fill="#A78BDA">Ask about this part</text>
+    <rect x="664" y="504" width="290" height="34" rx="9" fill="#FBF7FF" stroke="#ECE3FA"/>
+    <text x="678" y="526" class="t" font-size="12" fill="#3B3450">Why is Ellie so important?</text>
+    <rect x="964" y="504" width="82" height="34" rx="9" fill="#A78BDA"/>
+    <text x="1005" y="526" text-anchor="middle" class="t" font-size="13" font-weight="600" fill="#fff">Ask</text>
+
+    <!-- answer card -->
+    <rect x="664" y="552" width="382" height="104" rx="10" fill="#FBF7FF" stroke="#ECE3FA"/>
+    <g class="t" font-size="11.5" fill="#3B3450">
+      <text x="680" y="576">Ellie is immune to the Cordyceps infection — her</text>
+      <text x="680" y="594">blood could be the basis for a vaccine, which is</text>
+      <text x="680" y="612">why the Fireflies want her. This drives the finale.</text>
+    </g>
+    <rect x="680" y="624" width="200" height="22" rx="11" fill="#EBE2FB"/>
+    <text x="694" y="639" class="t" font-size="11" font-weight="600" fill="#A78BDA">↪ Related chapter: The Fireflies</text>
+  </g>
+</svg>

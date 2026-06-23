@@ -1,0 +1,74 @@
+<svg width="1280" height="360" viewBox="0 0 1280 360" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Storyteller">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="360" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FBF7FF"/>
+      <stop offset="0.55" stop-color="#F1EAFC"/>
+      <stop offset="1" stop-color="#E7DDFA"/>
+    </linearGradient>
+    <linearGradient id="title" x1="360" y1="120" x2="360" y2="210" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7B5FC0"/>
+      <stop offset="1" stop-color="#A78BDA"/>
+    </linearGradient>
+    <linearGradient id="page" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F4EEFF"/>
+    </linearGradient>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#A78BDA" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <rect width="1280" height="360" rx="28" fill="url(#bg)"/>
+
+  <!-- floating pastel chapter nodes (decorative, right side) -->
+  <g opacity="0.95">
+    <g stroke="#CDBDF0" stroke-width="3" fill="none" stroke-linecap="round">
+      <path d="M980 120 C980 160 980 170 980 196"/>
+      <path d="M980 170 C940 188 916 196 892 220"/>
+      <path d="M980 170 C1020 188 1044 196 1068 220"/>
+      <path d="M1068 220 C1068 252 1068 262 1068 286"/>
+    </g>
+    <g filter="url(#soft)">
+      <circle cx="980" cy="120" r="26" fill="#FFD8A8"/>
+      <circle cx="980" cy="196" r="20" fill="#B5EAD7"/>
+      <circle cx="892" cy="220" r="18" fill="#FFB7C5"/>
+      <circle cx="1068" cy="220" r="20" fill="#A8D8EA"/>
+      <circle cx="1068" cy="286" r="16" fill="#FCE1A8"/>
+    </g>
+  </g>
+
+  <!-- icon: open book + node -->
+  <g transform="translate(120,108)" filter="url(#soft)">
+    <circle cx="72" cy="-2" r="22" fill="#C8B6F0"/>
+    <path d="M72 70 C42 50 12 48 -12 60 L-12 150 C12 138 42 140 72 158 Z" fill="url(#page)" stroke="#C8B6F0" stroke-width="4"/>
+    <path d="M72 70 C102 50 132 48 156 60 L156 150 C132 138 102 140 72 158 Z" fill="url(#page)" stroke="#C8B6F0" stroke-width="4"/>
+    <path d="M72 70 L72 158" stroke="#A78BDA" stroke-width="5" stroke-linecap="round"/>
+    <g stroke="#D7C9F2" stroke-width="3.5" stroke-linecap="round">
+      <path d="M2 84 H56"/><path d="M2 104 H56"/><path d="M2 124 H56"/>
+      <path d="M88 84 H142"/><path d="M88 104 H142"/><path d="M88 124 H142"/>
+    </g>
+  </g>
+
+  <!-- wordmark -->
+  <text x="332" y="172" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="78" font-weight="800" fill="url(#title)">Storyteller</text>
+  <text x="336" y="222" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="26" font-weight="500" fill="#6F6488">Turn any story into an interactive tree you can explore.</text>
+
+  <!-- chips -->
+  <g font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="17" font-weight="600">
+    <g transform="translate(336,256)">
+      <rect width="92" height="36" rx="18" fill="#EBE2FB"/><text x="46" y="24" text-anchor="middle" fill="#7B5FC0">Games</text>
+    </g>
+    <g transform="translate(440,256)">
+      <rect width="86" height="36" rx="18" fill="#DFF4EB"/><text x="43" y="24" text-anchor="middle" fill="#3F8E72">Films</text>
+    </g>
+    <g transform="translate(538,256)">
+      <rect width="92" height="36" rx="18" fill="#FCE4ED"/><text x="46" y="24" text-anchor="middle" fill="#C45E7E">Anime</text>
+    </g>
+    <g transform="translate(642,256)">
+      <rect width="92" height="36" rx="18" fill="#E2F0FC"/><text x="46" y="24" text-anchor="middle" fill="#3F77A8">Books</text>
+    </g>
+    <g transform="translate(746,256)">
+      <rect width="110" height="36" rx="18" fill="#FCE7DB"/><text x="55" y="24" text-anchor="middle" fill="#C47A52">Anything</text>
+    </g>
+  </g>
+</svg>

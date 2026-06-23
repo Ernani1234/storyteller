@@ -1,0 +1,65 @@
+<svg width="960" height="170" viewBox="0 0 960 170" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Storyteller themes">
+  <defs>
+    <filter id="s" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="4" stdDeviation="7" flood-color="#9a8" flood-opacity="0.18"/>
+    </filter>
+    <style>.t{font-family:Segoe UI,Helvetica,Arial,sans-serif;font-weight:600;font-size:13px}</style>
+  </defs>
+  <rect width="960" height="170" rx="16" fill="#F4F1FA"/>
+
+  <!-- card template repeated; each: bg rect, 3 swatches, name -->
+  <!-- Lavender -->
+  <g transform="translate(24,24)" filter="url(#s)">
+    <rect width="140" height="122" rx="14" fill="#FBF7FF" stroke="#ECE3FA"/>
+    <rect x="16" y="18" width="30" height="30" rx="7" fill="#FBF7FF" stroke="#eee"/>
+    <rect x="54" y="18" width="30" height="30" rx="7" fill="#A78BDA"/>
+    <rect x="92" y="18" width="30" height="30" rx="7" fill="#CDBDF0"/>
+    <text x="16" y="78" class="t" fill="#3B3450">Lavender</text>
+    <rect x="16" y="90" width="108" height="8" rx="4" fill="#EBE2FB"/>
+  </g>
+  <!-- Mint -->
+  <g transform="translate(180,24)" filter="url(#s)">
+    <rect width="140" height="122" rx="14" fill="#F4FBF7" stroke="#DCF1E6"/>
+    <rect x="16" y="18" width="30" height="30" rx="7" fill="#F4FBF7" stroke="#eee"/>
+    <rect x="54" y="18" width="30" height="30" rx="7" fill="#6FC8A0"/>
+    <rect x="92" y="18" width="30" height="30" rx="7" fill="#A9E0C6"/>
+    <text x="16" y="78" class="t" fill="#2F4A3F">Mint</text>
+    <rect x="16" y="90" width="108" height="8" rx="4" fill="#DFF4EB"/>
+  </g>
+  <!-- Peach -->
+  <g transform="translate(336,24)" filter="url(#s)">
+    <rect width="140" height="122" rx="14" fill="#FFF8F4" stroke="#FBE6DA"/>
+    <rect x="16" y="18" width="30" height="30" rx="7" fill="#FFF8F4" stroke="#eee"/>
+    <rect x="54" y="18" width="30" height="30" rx="7" fill="#F0A47C"/>
+    <rect x="92" y="18" width="30" height="30" rx="7" fill="#F4C3A6"/>
+    <text x="16" y="78" class="t" fill="#5A3F37">Peach</text>
+    <rect x="16" y="90" width="108" height="8" rx="4" fill="#FCE7DB"/>
+  </g>
+  <!-- Sky -->
+  <g transform="translate(492,24)" filter="url(#s)">
+    <rect width="140" height="122" rx="14" fill="#F4F9FF" stroke="#DEEDFB"/>
+    <rect x="16" y="18" width="30" height="30" rx="7" fill="#F4F9FF" stroke="#eee"/>
+    <rect x="54" y="18" width="30" height="30" rx="7" fill="#79B8E8"/>
+    <rect x="92" y="18" width="30" height="30" rx="7" fill="#A9D2F0"/>
+    <text x="16" y="78" class="t" fill="#33455A">Sky</text>
+    <rect x="16" y="90" width="108" height="8" rx="4" fill="#E2F0FC"/>
+  </g>
+  <!-- Rose -->
+  <g transform="translate(648,24)" filter="url(#s)">
+    <rect width="140" height="122" rx="14" fill="#FFF6F9" stroke="#FBE0EA"/>
+    <rect x="16" y="18" width="30" height="30" rx="7" fill="#FFF6F9" stroke="#eee"/>
+    <rect x="54" y="18" width="30" height="30" rx="7" fill="#E891AC"/>
+    <rect x="92" y="18" width="30" height="30" rx="7" fill="#F2B6CB"/>
+    <text x="16" y="78" class="t" fill="#553944">Rose</text>
+    <rect x="16" y="90" width="108" height="8" rx="4" fill="#FCE4ED"/>
+  </g>
+  <!-- Dusk (dark) -->
+  <g transform="translate(804,24)" filter="url(#s)">
+    <rect width="140" height="122" rx="14" fill="#211E2B" stroke="#3A3450"/>
+    <rect x="16" y="18" width="30" height="30" rx="7" fill="#2F2A3E" stroke="#3A3450"/>
+    <rect x="54" y="18" width="30" height="30" rx="7" fill="#B9A3EC"/>
+    <rect x="92" y="18" width="30" height="30" rx="7" fill="#5A4F7E"/>
+    <text x="16" y="78" class="t" fill="#EDE7FA">Dusk</text>
+    <rect x="16" y="90" width="108" height="8" rx="4" fill="#3A3257"/>
+  </g>
+</svg>
