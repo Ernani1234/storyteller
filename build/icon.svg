@@ -1,0 +1,56 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FBF7FF"/>
+      <stop offset="1" stop-color="#EEE7FB"/>
+    </linearGradient>
+    <linearGradient id="book" x1="128" y1="300" x2="384" y2="460" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C8B6F0"/>
+      <stop offset="1" stop-color="#A78BDA"/>
+    </linearGradient>
+    <linearGradient id="page" x1="160" y1="300" x2="160" y2="440" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F4EEFF"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#A78BDA" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- rounded app background -->
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#bg)"/>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="none" stroke="#E3D9F7" stroke-width="2"/>
+
+  <!-- branching story tree -->
+  <g stroke-linecap="round" filter="url(#soft)">
+    <path d="M256 300 C256 230 256 210 256 170" stroke="#B7A2E6" stroke-width="14" fill="none"/>
+    <path d="M256 230 C210 210 180 196 150 150" stroke="#B7A2E6" stroke-width="12" fill="none"/>
+    <path d="M256 230 C302 210 332 196 362 150" stroke="#B7A2E6" stroke-width="12" fill="none"/>
+    <path d="M150 150 C132 122 120 110 104 92" stroke="#CDBDF0" stroke-width="9" fill="none"/>
+    <path d="M362 150 C380 122 392 110 408 92" stroke="#CDBDF0" stroke-width="9" fill="none"/>
+  </g>
+
+  <!-- node circles (story chapters) -->
+  <g filter="url(#soft)">
+    <circle cx="256" cy="170" r="34" fill="#FFD8A8"/>
+    <circle cx="150" cy="150" r="26" fill="#B5EAD7"/>
+    <circle cx="362" cy="150" r="26" fill="#FFB7C5"/>
+    <circle cx="104" cy="92" r="18" fill="#A8D8EA"/>
+    <circle cx="408" cy="92" r="18" fill="#FCE1A8"/>
+  </g>
+
+  <!-- open book -->
+  <g filter="url(#soft)">
+    <path d="M256 318 C214 290 168 288 128 304 L128 432 C168 416 214 418 256 446 Z" fill="url(#page)" stroke="#C8B6F0" stroke-width="6"/>
+    <path d="M256 318 C298 290 344 288 384 304 L384 432 C344 416 298 418 256 446 Z" fill="url(#page)" stroke="#C8B6F0" stroke-width="6"/>
+    <path d="M256 318 L256 446" stroke="#A78BDA" stroke-width="8" stroke-linecap="round"/>
+    <g stroke="#D7C9F2" stroke-width="5" stroke-linecap="round">
+      <path d="M156 332 H226"/>
+      <path d="M156 360 H226"/>
+      <path d="M156 388 H226"/>
+      <path d="M286 332 H356"/>
+      <path d="M286 360 H356"/>
+      <path d="M286 388 H356"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,36 @@
+{
+  "name": "storyteller",
+  "version": "1.0.0",
+  "description": "Explore the full story of any media as an interactive, clickable tree.",
+  "main": "./out/main/index.js",
+  "author": "Storyteller",
+  "license": "MIT",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "icon": "node scripts/generate-icon.mjs",
+    "dist": "npm run icon && electron-vite build && electron-builder",
+    "dist:dir": "npm run icon && electron-vite build && electron-builder --dir"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0",
+    "openai": "^4.67.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "electron": "^31.3.0",
+    "electron-builder": "^24.13.3",
+    "electron-vite": "^2.3.0",
+    "png-to-ico": "^2.1.8",
+    "reactflow": "^11.11.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sharp": "^0.33.4",
+    "typescript": "^5.5.3",
+    "vite": "^5.3.4"
+  }
+}

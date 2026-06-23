@@ -1,0 +1,10 @@
+node_modules
+out
+dist
+release
+build/icon.ico
+build/icon.png
+*.log
+*.tsbuildinfo
+.DS_Store
+.claude/
