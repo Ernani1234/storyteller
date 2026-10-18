@@ -1,0 +1,19 @@
+{
+  "appId": "com.storyteller.app",
+  "appName": "Storyteller",
+  "webDir": "out/mobile",
+  "backgroundColor": "#FBF7FF",
+  "android": {
+    "allowMixedContent": true
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    },
+    "SystemBars": {
+      "insetsHandling": "css",
+      "style": "LIGHT",
+      "initialViewportFitValueHint": "cover"
+    }
+  }
+}

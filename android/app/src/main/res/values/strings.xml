@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Storyteller</string>
+    <string name="title_activity_main">Storyteller</string>
+    <string name="package_name">com.storyteller.app</string>
+    <string name="custom_url_scheme">com.storyteller.app</string>
+</resources>
