@@ -1,4 +1,4 @@
-import type { StorytellerApi } from './index'
+import type { StorytellerApi } from '../shared/api'
 
 declare global {
   interface Window {

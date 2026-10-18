@@ -8,10 +8,13 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "types": ["node"]
+    "types": [
+      "node"
+    ]
   },
   "include": [
     "src/main/**/*",
+    "src/core/**/*",
     "src/preload/**/*",
     "src/shared/**/*",
     "electron.vite.config.ts",

@@ -19,7 +19,7 @@ const pngBuffers = await Promise.all(
 
 // Full-size png for Linux / docs / app window
 await sharp(svg, { density: 384 })
-  .resize(512, 512)
+  .resize(1024, 1024)
   .png()
   .toFile(resolve(buildDir, 'icon.png'))
 

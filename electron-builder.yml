@@ -1,5 +1,7 @@
 appId: com.storyteller.app
 productName: Storyteller
+copyright: Copyright © 2026 Ernani Neto
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}
 directories:
   buildResources: build
   output: release
@@ -7,11 +9,23 @@ files:
   - '!**/.vscode/*'
   - '!src/*'
   - '!scripts/*'
+  - '!docs/*'
+  - '!android/*'
+  - '!out/mobile/*'
+  - '!.github/*'
   - '!electron.vite.config.*'
+  - '!vite.mobile.config.*'
+  - '!capacitor.config.*'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
   - '!{.eslintrc,.prettierrc,README.md}'
+  # Capacitor packages are for the Android build only
+  - '!node_modules/@capacitor/**'
 asarUnpack:
   - resources/**
+# Without a signing certificate, macOS builds get an ad-hoc signature so they
+# open on Apple Silicon (see scripts/adhoc-sign.cjs).
+afterPack: scripts/adhoc-sign.cjs
+
 win:
   target:
     - target: nsis
@@ -25,3 +39,45 @@ nsis:
   createDesktopShortcut: true
   createStartMenuShortcut: true
   shortcutName: Storyteller
+  artifactName: ${productName}-${version}-windows-setup.${ext}
+
+mac:
+  target:
+    - target: dmg
+      arch:
+        - arm64
+        - x64
+    - target: zip
+      arch:
+        - arm64
+        - x64
+  icon: build/icon.png
+  category: public.app-category.education
+  # null = don't look for a Developer ID; set CSC_LINK in CI to sign for real.
+  identity: null
+  hardenedRuntime: false
+  gatekeeperAssess: false
+dmg:
+  artifactName: ${productName}-${version}-mac-${arch}.${ext}
+
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+    - target: deb
+      arch:
+        - x64
+  icon: build/icon.png
+  category: Education
+  executableName: storyteller
+  maintainer: Ernani Neto <Ernani1234@users.noreply.github.com>
+  synopsis: Explore the full story of any work as a map of chapters
+  description: >-
+    Type the name of any game, film, anime, series, book or comic and read its
+    whole story as an interactive map of chapters, built from open sources
+    (Wikipedia, Fandom, TVMaze, AniList) with optional AI.
+deb:
+  artifactName: ${productName}-${version}-linux-${arch}.${ext}
+appImage:
+  artifactName: ${productName}-${version}-linux-${arch}.${ext}

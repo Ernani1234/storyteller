@@ -1,23 +1,44 @@
 {
   "name": "storyteller",
-  "version": "1.0.0",
-  "description": "Explore the full story of any media as an interactive, clickable tree.",
+  "version": "2.0.0",
+  "description": "Explore the full story of any media as an interactive, clickable tree — from open sources, with optional AI.",
   "main": "./out/main/index.js",
-  "author": "Storyteller",
+  "author": {
+    "name": "Ernani Neto",
+    "url": "https://github.com/Ernani1234"
+  },
   "license": "MIT",
   "scripts": {
     "dev": "electron-vite dev",
-    "build": "electron-vite build",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json --composite false && tsc --noEmit -p tsconfig.web.json --composite false",
+    "build": "npm run typecheck && electron-vite build",
     "start": "electron-vite preview",
     "icon": "node scripts/generate-icon.mjs",
-    "dist": "npm run icon && electron-vite build && electron-builder",
-    "dist:dir": "npm run icon && electron-vite build && electron-builder --dir"
+    "icon:android": "node scripts/generate-android-assets.mjs",
+    "dist": "npm run icon && npm run build && electron-builder",
+    "dist:win": "npm run icon && npm run build && electron-builder --win",
+    "dist:mac": "npm run icon && npm run build && electron-builder --mac",
+    "dist:linux": "npm run icon && npm run build && electron-builder --linux",
+    "dist:dir": "npm run icon && npm run build && electron-builder --dir",
+    "build:mobile": "vite build -c vite.mobile.config.ts",
+    "preview:mobile": "vite preview -c vite.mobile.config.ts",
+    "android:sync": "npm run build:mobile && cap sync android",
+    "android:apk": "node scripts/android-build.mjs release",
+    "android:apk:debug": "node scripts/android-build.mjs debug",
+    "android:open": "cap open android"
   },
   "dependencies": {
+    "@capacitor/android": "8.5.2",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/browser": "8.0.5",
+    "@capacitor/core": "8.5.2",
+    "@capacitor/filesystem": "8.1.4",
+    "@capacitor/share": "8.0.3",
     "electron-store": "^8.2.0",
     "openai": "^4.67.3"
   },
   "devDependencies": {
+    "@capacitor/cli": "8.5.2",
     "@types/node": "^20.14.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
@@ -26,11 +47,21 @@
     "electron-builder": "^24.13.3",
     "electron-vite": "^2.3.0",
     "png-to-ico": "^2.1.8",
-    "reactflow": "^11.11.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "reactflow": "^11.11.4",
     "sharp": "^0.33.4",
     "typescript": "^5.5.3",
     "vite": "^5.3.4"
+  },
+  "allowScripts": {
+    "electron@31.7.7": true,
+    "esbuild@0.21.5": true,
+    "sharp@0.33.5": true
+  },
+  "homepage": "https://github.com/Ernani1234/storyteller",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ernani1234/storyteller.git"
   }
 }

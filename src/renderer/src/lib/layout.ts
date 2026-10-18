@@ -1,106 +1,157 @@
 import type { Edge, Node } from 'reactflow'
-import type { StoryNode, StoryOutline } from '../../../shared/types'
+import { childrenMap, readingOrder } from '../../../shared/tree'
+import type { NodeKind, StoryNode, StoryOutline } from '../../../shared/types'
 
 export interface StoryNodeData {
   title: string
   summary: string
   index: number
-  hasDetail: boolean
+  kind?: NodeKind
+  episodes?: number
+  isRead: boolean
   isActive: boolean
   isBlinking: boolean
+  isDimmed: boolean
+  isMatch: boolean
+  veiled: boolean
 }
 
-const NODE_W = 230
-const X_GAP = 60
-const Y_GAP = 150
+export const NODE_W = 240
+const NODE_H = 150
+const X_GAP = 64
+const TREE_Y_GAP = 180
+const ROW_GAP = 70
 
-interface Tree {
-  node: StoryNode
-  children: Tree[]
+export interface LayoutOptions {
+  activeId?: string
+  blinkId?: string
+  readIds: Set<string>
+  matchIds: Set<string> | null
+  spoilerShield: boolean
+  /** phones: 1 = a single column read top to bottom. */
+  maxColumns?: number
 }
 
-function buildTree(outline: StoryOutline): Tree | null {
-  const byId = new Map(outline.nodes.map((n) => [n.id, n]))
-  const childrenOf = new Map<string | null, StoryNode[]>()
-  for (const n of outline.nodes) {
-    const key = n.parentId && byId.has(n.parentId) ? n.parentId : null
-    const arr = childrenOf.get(key) ?? []
-    arr.push(n)
-    childrenOf.set(key, arr)
-  }
-  for (const arr of childrenOf.values()) arr.sort((a, b) => a.order - b.order)
-
-  const roots = childrenOf.get(null) ?? []
-  if (!roots.length) return null
-
-  const make = (n: StoryNode): Tree => ({
-    node: n,
-    children: (childrenOf.get(n.id) ?? []).map(make)
-  })
-
-  // If multiple roots slipped through, attach the rest under the first.
-  const tree = make(roots[0])
-  for (let i = 1; i < roots.length; i++) tree.children.push(make(roots[i]))
-  return tree
+interface Placed {
+  x: number
+  y: number
 }
 
 /**
- * Tidy top-down layout: leaves take sequential horizontal slots, parents
- * center over their children. Returns reactflow nodes + edges.
+ * Tidy top-down layout for branching stories: leaves take sequential
+ * horizontal slots, parents center over their children.
  */
-export function layoutOutline(
-  outline: StoryOutline,
-  opts: { activeId?: string; blinkId?: string; detailIds: Set<string> }
-): { nodes: Node<StoryNodeData>[]; edges: Edge[] } {
-  const tree = buildTree(outline)
-  if (!tree) return { nodes: [], edges: [] }
-
-  const positions = new Map<string, { x: number; depth: number }>()
+function treePositions(outline: StoryOutline): Map<string, Placed> {
+  const kids = childrenMap(outline.nodes)
+  const pos = new Map<string, Placed>()
   let cursor = 0
-  let counter = 0
-  const indexOf = new Map<string, number>()
-
-  const place = (t: Tree, depth: number): number => {
-    indexOf.set(t.node.id, counter++)
+  const place = (n: StoryNode, depth: number): number => {
+    const children = kids.get(n.id) ?? []
     let x: number
-    if (t.children.length === 0) {
+    if (!children.length) {
       x = cursor
       cursor += NODE_W + X_GAP
     } else {
-      const childXs = t.children.map((c) => place(c, depth + 1))
-      x = (childXs[0] + childXs[childXs.length - 1]) / 2
+      const xs = children.map((c) => place(c, depth + 1))
+      x = (xs[0] + xs[xs.length - 1]) / 2
     }
-    positions.set(t.node.id, { x, depth })
+    pos.set(n.id, { x, y: depth * TREE_Y_GAP })
     return x
   }
-  place(tree, 0)
+  for (const root of kids.get(null) ?? []) place(root, 0)
+  return pos
+}
 
-  const nodes: Node<StoryNodeData>[] = outline.nodes.map((n) => {
-    const pos = positions.get(n.id) ?? { x: 0, depth: 0 }
+/**
+ * Serpentine layout for linear stories: a long chain read left→right, then
+ * right→left on the next row, like a board game path. Fits a 15-chapter story
+ * on one screen instead of a 2,500px-tall column.
+ */
+function snakePositions(order: StoryNode[], maxColumns = 5): { pos: Map<string, Placed>; cols: number } {
+  const n = order.length
+  const cols = Math.min(maxColumns, Math.max(Math.min(3, maxColumns), Math.round(Math.sqrt(n * 1.8))))
+  const pos = new Map<string, Placed>()
+  order.forEach((node, i) => {
+    const row = Math.floor(i / cols)
+    const inRow = i % cols
+    const col = row % 2 === 0 ? inRow : cols - 1 - inRow
+    pos.set(node.id, { x: col * (NODE_W + X_GAP), y: row * (NODE_H + ROW_GAP) })
+  })
+  return { pos, cols }
+}
+
+export function layoutOutline(
+  outline: StoryOutline,
+  opts: LayoutOptions
+): { nodes: Node<StoryNodeData>[]; edges: Edge[] } {
+  const order = readingOrder(outline.nodes)
+  if (!order.length) return { nodes: [], edges: [] }
+  const indexOf = new Map(order.map((n, i) => [n.id, i]))
+  const kids = childrenMap(outline.nodes)
+  const isChain = outline.nodes.every((n) => (kids.get(n.id)?.length ?? 0) <= 1)
+  const snake = isChain && (order.length > 4 || opts.maxColumns === 1)
+  const { pos, cols } = snake ? snakePositions(order, opts.maxColumns) : { pos: treePositions(outline), cols: 0 }
+
+  const nodes: Node<StoryNodeData>[] = order.map((n) => {
+    const p = pos.get(n.id) ?? { x: 0, y: 0 }
+    const isRead = opts.readIds.has(n.id)
+    const isActive = opts.activeId === n.id
     return {
       id: n.id,
       type: 'story',
-      position: { x: pos.x, y: pos.depth * Y_GAP },
+      position: p,
       data: {
         title: n.title,
         summary: n.summary,
         index: (indexOf.get(n.id) ?? 0) + 1,
-        hasDetail: opts.detailIds.has(n.id),
-        isActive: opts.activeId === n.id,
-        isBlinking: opts.blinkId === n.id
+        kind: n.kind,
+        episodes: n.episodes?.length,
+        isRead,
+        isActive,
+        isBlinking: opts.blinkId === n.id,
+        isDimmed: !!opts.matchIds && !opts.matchIds.has(n.id),
+        isMatch: !!opts.matchIds && opts.matchIds.has(n.id),
+        veiled: opts.spoilerShield && !isRead && !isActive
       }
     }
   })
 
-  const edges: Edge[] = outline.nodes
-    .filter((n) => n.parentId && positions.has(n.parentId))
-    .map((n) => ({
-      id: `${n.parentId}->${n.id}`,
-      source: n.parentId!,
-      target: n.id,
-      type: 'smoothstep',
-      animated: false
-    }))
+  const edgeClass = (a: string, b: string): string =>
+    opts.readIds.has(a) && opts.readIds.has(b) ? 'is-read' : ''
 
+  let edges: Edge[]
+  if (snake) {
+    edges = order.slice(1).map((n, k) => {
+      const prev = order[k]
+      const rowA = Math.floor(k / cols)
+      const rowB = Math.floor((k + 1) / cols)
+      const handles =
+        rowA !== rowB
+          ? { sourceHandle: 'b', targetHandle: 't' }
+          : rowA % 2 === 0
+            ? { sourceHandle: 'rs', targetHandle: 'lt' }
+            : { sourceHandle: 'ls', targetHandle: 'rt' }
+      return {
+        id: `${prev.id}->${n.id}`,
+        source: prev.id,
+        target: n.id,
+        type: 'smoothstep',
+        className: edgeClass(prev.id, n.id),
+        ...handles
+      }
+    })
+  } else {
+    edges = outline.nodes
+      .filter((n) => n.parentId && pos.has(n.parentId))
+      .map((n) => ({
+        id: `${n.parentId}->${n.id}`,
+        source: n.parentId!,
+        target: n.id,
+        sourceHandle: 'b',
+        targetHandle: 't',
+        type: 'smoothstep',
+        className: edgeClass(n.parentId!, n.id)
+      }))
+  }
   return { nodes, edges }
 }
