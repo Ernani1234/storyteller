@@ -83,6 +83,8 @@ async function queryPages(lang: string, params: Record<string, string | number>)
       formatversion: 2,
       prop: 'pageimages|description|pageprops',
       piprop: 'thumbnail',
+      // covers of films, games and books are non-free (fair use); the default only returns free images
+      pilicense: 'any',
       pithumbsize: 120,
       ppprop: 'wikibase_item|disambiguation',
       redirects: 1,
@@ -152,9 +154,10 @@ export async function suggest(query: string, lang: string, limit = 7): Promise<S
     }
   }
   // Top up from English when the local wiki is thin, or when it lacks the
-  // exact title the user typed (e.g. pt redirects "…: Brotherhood" to the manga).
+  // exact title the user typed: pt calls the Attack on Titan manga "Shingeki
+  // no Kyojin", so locally the best "match" is a spin-off game.
   const bestLocal = Math.max(0, ...out.map((s) => exactness(s.title, q)))
-  if (lang !== 'en' && (out.length < 3 || bestLocal < 1)) {
+  if (lang !== 'en' && (out.length < 3 || bestLocal < 2)) {
     const known = new Set(out.map((s) => s.qid).filter(Boolean))
     const en = (await run('en', q).catch(() => [])).filter((s) => !s.qid || !known.has(s.qid))
     const bestEn = Math.max(0, ...en.map((s) => exactness(s.title, q)))
@@ -195,6 +198,8 @@ export async function getPage(lang: string, title: string): Promise<WikiPage | n
       redirects: 1,
       ppprop: 'wikibase_item',
       piprop: 'thumbnail',
+      // covers of films, games and books are non-free (fair use); the default only returns free images
+      pilicense: 'any',
       pithumbsize: 600,
       inprop: 'url'
     })}`

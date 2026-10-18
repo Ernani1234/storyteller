@@ -23,6 +23,7 @@ interface Entity {
 export interface WdRef {
   qid: string
   label: string
+  labelEn?: string
   description?: string
   wikiTitle?: string
   wikiLang?: string
@@ -48,6 +49,10 @@ export interface WdWork {
   characters: Character[]
   cast: Character[]
   fandom: string[]
+  /** season items of a series ("has part"), with their number when Wikidata gives it */
+  seasons: { qid: string; number?: number }[]
+  /** "List of … episodes" article item */
+  episodeList?: string
   tvmazeId?: string
   imdb?: string
   anilistAnime?: number
@@ -111,6 +116,8 @@ async function pageThumbs(lang: string, titles: string[]): Promise<Map<string, s
         titles: titles.slice(i, i + 50).join('|'),
         prop: 'pageimages',
         piprop: 'thumbnail',
+        // covers of films, games and books are non-free (fair use); the default only returns free images
+        pilicense: 'any',
         pithumbsize: 240,
         redirects: 1
       })}`
@@ -244,6 +251,7 @@ export async function getWork(qid: string, lang: string): Promise<WdWork | null>
     return {
       qid: id,
       label,
+      labelEn: e.labels?.en?.value ?? e.labels?.mul?.value,
       description: pick(e.descriptions, lang),
       wikiTitle: local ?? en,
       wikiLang: local ? lang : en ? 'en' : undefined
@@ -306,6 +314,14 @@ export async function getWork(qid: string, lang: string): Promise<WdWork | null>
     characters,
     cast: castOut,
     fandom: strings(main, 'P6262'),
+    seasons: claims(main, 'P527').map((c) => {
+      const ord = c.qualifiers?.P1545?.[0]?.datavalue?.value
+      return {
+        qid: (c.mainsnak.datavalue!.value as { id: string }).id,
+        number: typeof ord === 'string' && /^\d+$/.test(ord) ? Number(ord) : undefined
+      }
+    }),
+    episodeList: itemIds(main, 'P1811', 1)[0],
     tvmazeId: strings(main, 'P8600')[0],
     imdb: strings(main, 'P345')[0],
     anilistAnime: num('P8729'),

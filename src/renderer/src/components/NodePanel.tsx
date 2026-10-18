@@ -54,6 +54,9 @@ function Highlighted({ text, highlight }: { text: string; highlight: string | nu
 
 function EpisodeList({ episodes, highlight }: { episodes: Episode[]; highlight: string | null }): JSX.Element {
   const { t } = useI18n()
+  // Real synopses (not one-line blurbs) are the season's story: show them open.
+  const avgWords = episodes.reduce((n, e) => n + e.summary.split(/s+/).length, 0) / Math.max(1, episodes.length)
+  const openAll = episodes.length <= 30 && avgWords >= 50
   return (
     <section className="episodes">
       <h3>
@@ -64,7 +67,7 @@ function EpisodeList({ episodes, highlight }: { episodes: Episode[]; highlight: 
           const hit = !!highlight && !!findLoose(e.summary, highlight)
           return (
             <li key={e.id}>
-              <details open={hit || undefined}>
+              <details open={hit || openAll || undefined}>
                 <summary>
                   <span className="ep__num">{e.number ?? '•'}</span>
                   <span className="ep__title">{e.title}</span>

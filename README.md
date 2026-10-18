@@ -72,7 +72,7 @@ Even in **Sources** mode you can press **Retell with AI** on a single chapter, a
 | 📤 | **Export and import** | Markdown, PDF, or a Storyteller file you can share and import back. |
 | 🖼️ | **Story images** | Fandom screenshots of the actual scenes, plus Wikipedia/Commons images that must name what was searched for. Click to enlarge. |
 | 🎨 | **Seven themes + system** | Lavender, Mint, Peach, Sky, Rose, and the dark Dusk and Night — or follow the OS. Sans or serif reading font, adjustable text size. |
-| 🌐 | **Portuguese and English UI** | The interface follows your system or your choice; stories can be read in English, Português, Español, Français, Deutsch, Italiano or 日本語. |
+| 🌐 | **Seven interface languages** | Starts in English; switch to Português (Brasil), Español, Français, Deutsch, Italiano or 日本語 on the welcome screen or in Settings. Stories follow the interface language unless you pick another one. |
 | 🤖 | **Any OpenAI-compatible model** | OpenAI, or a local server such as Ollama or LM Studio (any `/v1` endpoint). Reasoning models (o-series, gpt-5) are supported. |
 | ⌨️ | **Keyboard first** | `Ctrl K` or `/` to search, `←` `→` (or `J` `K`) between chapters, `Esc` to close. |
 | 🔐 | **Local-first and private** | Your key is encrypted by the OS and never reaches the UI process. Source lookups are cached for a week, so saved stories open offline. |
@@ -286,7 +286,7 @@ storyteller/
 │  │  ├─ components/            #   StoryTree, NodePanel, ReaderView, CharactersView, InfoView, Home…
 │  │  ├─ platform/              #   Android / browser host: IndexedDB, share sheet, back button
 │  │  ├─ lib/                   #   layout (tree + serpentine), tts, scroll
-│  │  ├─ i18n.tsx               #   Portuguese / English
+│  │  ├─ i18n/                  #   en (keys) + pt, es, fr, de, it, ja
 │  │  └─ themes.ts
 │  └─ shared/                   # types, the bridge API, text and tree utilities
 ├─ android/                     # Capacitor Android project

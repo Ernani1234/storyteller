@@ -67,9 +67,27 @@ const LANG_CODES: Record<string, string> = {
   Italiano: 'it'
 }
 
-/** Language code to read/write stories in (wiki edition for scraping). */
+/** English names, for telling the AI which language to write in. */
+const AI_LANG_NAMES: Record<string, string> = {
+  en: 'English',
+  pt: 'Brazilian Portuguese',
+  es: 'Spanish',
+  fr: 'French',
+  ja: 'Japanese',
+  de: 'German',
+  it: 'Italian'
+}
+
+/**
+ * Language code to read/write stories in (wiki edition for scraping).
+ * "auto" means the same language as the interface.
+ */
 export function contentLang(s: Settings = getSettings()): string {
   if (s.language && s.language !== 'auto') return LANG_CODES[s.language] ?? 'en'
-  const locale = core().locale().slice(0, 2).toLowerCase()
-  return Object.values(LANG_CODES).includes(locale) ? locale : 'en'
+  return Object.values(LANG_CODES).includes(s.uiLanguage) ? s.uiLanguage : 'en'
+}
+
+/** The story language as the AI prompt names it ("Brazilian Portuguese"). */
+export function contentLangName(s: Settings = getSettings()): string {
+  return AI_LANG_NAMES[contentLang(s)] ?? 'English'
 }

@@ -11,6 +11,7 @@ interface Props {
   story: SavedStory
   view: View
   spoilerShield: boolean
+  storyDetail: 'complete' | 'local'
   continueTitle: string | null
   filter: string
   matchCount: number | null
@@ -123,7 +124,9 @@ export default function StoryHeader(p: Props): JSX.Element {
       {o.notice && (
         <p className="notice" role="note">
           <Icon name="info" size={16} />
-          {o.notice.kind === 'thin' ? t('story.notice.thin') : t('story.notice.lang', { lang: langName(o.notice.lang) })}
+          {o.notice.kind === 'thin'
+            ? t('story.notice.thin')
+            : t(p.storyDetail === 'complete' ? 'story.notice.langComplete' : 'story.notice.lang', { lang: langName(o.notice.lang) })}
         </p>
       )}
 

@@ -8,6 +8,24 @@ const MEM_MAX = 400
 
 const mem = new Map<string, CacheEntry>()
 
+// Be a polite client: building one story can touch dozens of pages, and
+// Wikimedia answers bursts with "You are making too many requests".
+const PER_HOST = 4
+const inFlight = new Map<string, number>()
+const waiting = new Map<string, (() => void)[]>()
+
+async function acquire(host: string): Promise<() => void> {
+  if ((inFlight.get(host) ?? 0) >= PER_HOST) {
+    await new Promise<void>((resolve) => waiting.set(host, [...(waiting.get(host) ?? []), resolve]))
+  }
+  inFlight.set(host, (inFlight.get(host) ?? 0) + 1)
+  return () => {
+    inFlight.set(host, (inFlight.get(host) ?? 1) - 1)
+    const next = waiting.get(host)?.shift()
+    if (next) next()
+  }
+}
+
 function remember(key: string, entry: CacheEntry): void {
   mem.set(key, entry)
   if (mem.size > MEM_MAX) mem.delete(mem.keys().next().value as string)
@@ -77,10 +95,12 @@ export async function getJson<T = any>(url: string, opts: GetJsonOptions = {}): 
     })
 
   const started = Date.now()
+  const release = await acquire(new URL(url).host)
   try {
     let res = await attempt()
-    if (res.status === 429 || res.status >= 500) {
-      await new Promise((r) => setTimeout(r, 700))
+    // Back off and retry when the server says slow down (or hiccups).
+    for (let retry = 1; retry <= 2 && (res.status === 429 || res.status >= 500); retry++) {
+      await new Promise((r) => setTimeout(r, 900 * retry))
       res = await attempt()
     }
     if (res.status === 404 && opts.allow404) {
@@ -98,6 +118,8 @@ export async function getJson<T = any>(url: string, opts: GetJsonOptions = {}): 
     if (stale) return stale.data as T
     if (err instanceof AppError) throw err
     throw new AppError('NETWORK', `${new URL(url).host}: ${(err as Error).message}`)
+  } finally {
+    release()
   }
 }
 

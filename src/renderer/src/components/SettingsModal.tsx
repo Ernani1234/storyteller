@@ -3,7 +3,8 @@ import Icon, { type IconName } from './Icon'
 import { ENGINE_ICON } from './EngineSwitch'
 import { themes, applyAppearance, SYSTEM_THEME } from '../themes'
 import { useI18n } from '../i18n'
-import type { DataInfo, Engine, PublicSettings, SettingsPatch, SourceToggles } from '../../../shared/types'
+import { UI_LANGUAGES, UI_LANGUAGE_NAMES, UI_LANGUAGE_TAGS } from '../../../shared/languages'
+import type { DataInfo, Engine, PublicSettings, SettingsPatch, SourceToggles, UiLanguage } from '../../../shared/types'
 
 export type SettingsSection = 'appearance' | 'engine' | 'ai' | 'data'
 
@@ -99,6 +100,7 @@ export default function SettingsModal({ settings, section: initial, onClose, onS
       readingFont: draft.readingFont,
       textScale: draft.textScale,
       spoilerShield: draft.spoilerShield,
+      storyDetail: draft.storyDetail,
       sources: draft.sources
     }
     if (keyInput.trim()) patch.apiKey = keyInput.trim()
@@ -162,10 +164,12 @@ export default function SettingsModal({ settings, section: initial, onClose, onS
                 <section className="set-section set-grid">
                   <label className="field">
                     <span className="field__label">{t('settings.uiLanguage')}</span>
-                    <select className="input" value={draft.uiLanguage} onChange={(e) => set('uiLanguage', e.target.value as PublicSettings['uiLanguage'])}>
-                      <option value="auto">{t('settings.uiLanguage.auto')}</option>
-                      <option value="pt">Português</option>
-                      <option value="en">English</option>
+                    <select className="input" value={draft.uiLanguage} onChange={(e) => set('uiLanguage', e.target.value as UiLanguage)}>
+                      {UI_LANGUAGES.map((l) => (
+                        <option key={l} value={l} lang={UI_LANGUAGE_TAGS[l]}>
+                          {UI_LANGUAGE_NAMES[l]}
+                        </option>
+                      ))}
                     </select>
                   </label>
                   <label className="field">
@@ -226,11 +230,19 @@ export default function SettingsModal({ settings, section: initial, onClose, onS
                     <select className="input" value={draft.language} onChange={(e) => set('language', e.target.value)}>
                       {STORY_LANGS.map((l) => (
                         <option key={l} value={l}>
-                          {l === 'auto' ? t('settings.lang.auto') : l}
+                          {l === 'auto' ? `${t('settings.lang.auto')} (${UI_LANGUAGE_NAMES[draft.uiLanguage]})` : l}
                         </option>
                       ))}
                     </select>
                     <span className="hint">{t('settings.storyLanguageDesc')}</span>
+                  </label>
+                  <label className="field">
+                    <span className="field__label">{t('settings.storyDetail')}</span>
+                    <select className="input" value={draft.storyDetail} onChange={(e) => set('storyDetail', e.target.value as PublicSettings['storyDetail'])}>
+                      <option value="complete">{t('settings.detail.complete')}</option>
+                      <option value="local">{t('settings.detail.local')}</option>
+                    </select>
+                    <span className="hint">{t('settings.storyDetailDesc')}</span>
                   </label>
                 </section>
 

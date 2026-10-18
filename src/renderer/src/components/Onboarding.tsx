@@ -1,15 +1,20 @@
 import { useState } from 'react'
 import Icon from './Icon'
 import { useI18n } from '../i18n'
-import type { PublicSettings } from '../../../shared/types'
+import { UI_LANGUAGES, UI_LANGUAGE_NAMES, UI_LANGUAGE_TAGS } from '../../../shared/languages'
+import type { PublicSettings, UiLanguage } from '../../../shared/types'
 
 interface Props {
-  onDone: (s: PublicSettings) => void
+  /** Every save lands here; the app leaves onboarding once `onboarded` is set. */
+  onSaved: (s: PublicSettings) => void
 }
 
-/** First run: pick no-AI (default) or connect an AI provider. Never blocks the app. */
-export default function Onboarding({ onDone }: Props): JSX.Element {
-  const { t } = useI18n()
+/**
+ * First run: pick the interface language (English by default), then no-AI
+ * (default) or connect an AI provider. Never blocks the app.
+ */
+export default function Onboarding({ onSaved }: Props): JSX.Element {
+  const { t, lang } = useI18n()
   const [step, setStep] = useState<'choose' | 'ai'>('choose')
   const [key, setKey] = useState('')
   const [baseUrl, setBaseUrl] = useState('')
@@ -17,7 +22,7 @@ export default function Onboarding({ onDone }: Props): JSX.Element {
   const [error, setError] = useState('')
 
   async function startWithoutAi(): Promise<void> {
-    onDone(await window.storyteller.saveSettings({ engine: 'sources', onboarded: true }))
+    onSaved(await window.storyteller.saveSettings({ engine: 'sources', onboarded: true }))
   }
 
   async function connect(): Promise<void> {
@@ -40,15 +45,32 @@ export default function Onboarding({ onDone }: Props): JSX.Element {
       onboarded: true
     })
     setBusy(false)
-    onDone(saved)
+    onSaved(saved)
   }
 
   return (
     <div className="onboard">
       <div className="onboard__card">
-        <div className="brand brand--lg">
-          <span className="brand__mark">✦</span>
-          <span className="brand__name">Storyteller</span>
+        <div className="onboard__top">
+          <div className="brand brand--lg">
+            <span className="brand__mark">✦</span>
+            <span className="brand__name">Storyteller</span>
+          </div>
+          <label className="lang-pick" title={t('onboard.language')}>
+            <Icon name="globe" size={16} />
+            <select
+              className="input"
+              aria-label={t('onboard.language')}
+              value={lang}
+              onChange={async (e) => onSaved(await window.storyteller.saveSettings({ uiLanguage: e.target.value as UiLanguage }))}
+            >
+              {UI_LANGUAGES.map((l) => (
+                <option key={l} value={l} lang={UI_LANGUAGE_TAGS[l]}>
+                  {UI_LANGUAGE_NAMES[l]}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
         <p className="onboard__lede">{t('onboard.lede')}</p>
 

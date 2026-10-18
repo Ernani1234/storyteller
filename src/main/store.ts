@@ -1,6 +1,7 @@
 import { safeStorage } from 'electron'
 import Store from 'electron-store'
 import { DEFAULT_SETTINGS, sanitizePatch, toPublic } from '../core/settings'
+import { normalizeUiLanguage } from '../shared/languages'
 import type { Engine, PublicSettings, Settings, SettingsPatch, SourceToggles } from '../shared/types'
 
 interface Persisted {
@@ -16,6 +17,7 @@ interface Persisted {
   readingFont: Settings['readingFont']
   textScale: number
   spoilerShield: boolean
+  storyDetail: Settings['storyDetail']
   sources: SourceToggles
   // engine / onboarded are intentionally NOT in defaults, so we can tell a
   // v1 user (who had a key and expects AI) apart from a fresh install.
@@ -72,10 +74,11 @@ export function getSettings(): Settings {
     model: store.get('model'),
     theme: store.get('theme'),
     language: store.get('language'),
-    uiLanguage: store.get('uiLanguage'),
+    uiLanguage: normalizeUiLanguage(store.get('uiLanguage')),
     readingFont: store.get('readingFont'),
     textScale: store.get('textScale'),
     spoilerShield: store.get('spoilerShield'),
+    storyDetail: store.get('storyDetail') ?? DEFAULT_SETTINGS.storyDetail,
     sources: { ...DEFAULT_SETTINGS.sources, ...store.get('sources') }
   }
 }

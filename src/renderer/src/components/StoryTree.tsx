@@ -50,14 +50,22 @@ function Flow({ outline, activeId, blinkId, readIds, matchIds, spoilerShield, on
     [outline, activeId, blinkId, readIds, matchIds, spoilerShield, narrow]
   )
 
-  // Phones: start at the first chapter, cards at a readable size, and let the
-  // reader scroll down the column instead of shrinking the whole map to fit.
+  // Phones and long stories (a 40-chapter book): start at the first chapter
+  // with cards at a readable size, and let the reader scroll on, instead of
+  // shrinking the whole map until nothing can be read.
+  const big = nodes.length > 20
   useEffect(() => {
-    if (!narrow) return
+    if (!narrow && !big) return
     const w = wrapper.current?.clientWidth ?? window.innerWidth
-    const zoom = Math.min(1, (w - 40) / NODE_W)
-    rf.setViewport({ x: (w - NODE_W * zoom) / 2, y: 20, zoom })
-  }, [narrow, outline.id, rf])
+    if (narrow) {
+      const zoom = Math.min(1, (w - 40) / NODE_W)
+      rf.setViewport({ x: (w - NODE_W * zoom) / 2, y: 20, zoom })
+      return
+    }
+    const graphW = Math.max(...nodes.map((n) => n.position.x)) + NODE_W
+    const zoom = Math.max(0.6, Math.min(1, (w - 80) / graphW))
+    rf.setViewport({ x: (w - graphW * zoom) / 2, y: 28, zoom })
+  }, [narrow, big, outline.id, rf])
 
   // Keep the open chapter in view. Waits for the side panel's slide-in so the
   // center is computed on the final canvas width.
@@ -85,7 +93,7 @@ function Flow({ outline, activeId, blinkId, readIds, matchIds, spoilerShield, on
         edges={edges}
         nodeTypes={nodeTypes}
         onNodeClick={handleClick}
-        fitView={!narrow}
+        fitView={!narrow && !big}
         fitViewOptions={{ padding: 0.18, maxZoom: 1 }}
         minZoom={0.15}
         maxZoom={1.6}
