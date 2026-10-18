@@ -8,6 +8,7 @@ import { verifyAi, listModels } from '../../../core/ai'
 import { buildOutline, buildNode, ask, suggest } from '../../../core/engine'
 import * as library from '../../../core/library'
 import { fileName, parseImported, toHtml, toJson, toMarkdown } from '../../../core/exporting'
+import { normalizeUiLanguage } from '../../../shared/languages'
 import type { StorytellerApi } from '../../../shared/api'
 import type { ApiResult, BuildStep, ExportFormat, ExportLabels, SavedStory, Settings } from '../../../shared/types'
 
@@ -23,7 +24,12 @@ const SETTINGS_KEY = 'storyteller-settings'
 function loadSettings(): Settings {
   try {
     const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) ?? '{}') as Partial<Settings>
-    return { ...DEFAULT_SETTINGS, ...saved, sources: { ...DEFAULT_SETTINGS.sources, ...saved.sources } }
+    return {
+      ...DEFAULT_SETTINGS,
+      ...saved,
+      uiLanguage: normalizeUiLanguage(saved.uiLanguage),
+      sources: { ...DEFAULT_SETTINGS.sources, ...saved.sources }
+    }
   } catch {
     return { ...DEFAULT_SETTINGS }
   }

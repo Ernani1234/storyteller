@@ -8,8 +8,10 @@
  *   obscure titles that have no wiki plot).
  */
 export type Engine = 'sources' | 'hybrid' | 'ai'
-export type UiLanguage = 'auto' | 'en' | 'pt'
+export type UiLanguage = 'en' | 'pt' | 'es' | 'fr' | 'de' | 'it' | 'ja'
 export type ReadingFont = 'sans' | 'serif'
+/** complete: the longest telling of the story wins, whatever its language. local: stay in the story language when possible. */
+export type StoryDetail = 'complete' | 'local'
 
 export interface SourceToggles {
   wikipedia: boolean
@@ -31,6 +33,7 @@ export interface Settings {
   readingFont: ReadingFont
   textScale: number
   spoilerShield: boolean
+  storyDetail: StoryDetail
   sources: SourceToggles
   onboarded: boolean
 }

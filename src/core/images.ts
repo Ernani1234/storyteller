@@ -38,6 +38,8 @@ async function searchWikipedia(lang: string, query: string, limit: number): Prom
       gsrnamespace: 0,
       prop: 'pageimages|info',
       piprop: 'thumbnail',
+      // covers of films, games and books are non-free (fair use); the default only returns free images
+      pilicense: 'any',
       pithumbsize: 640,
       inprop: 'url'
     })}`,

@@ -60,7 +60,7 @@ export default function App(): JSX.Element {
   return (
     <I18nProvider pref={settings.uiLanguage}>
       <ToastProvider>
-        {settings.onboarded ? <Shell settings={settings} setSettings={setSettings} /> : <Onboarding onDone={setSettings} />}
+        {settings.onboarded ? <Shell settings={settings} setSettings={setSettings} /> : <Onboarding onSaved={setSettings} />}
       </ToastProvider>
     </I18nProvider>
   )
@@ -440,6 +440,7 @@ function Shell({ settings, setSettings }: { settings: PublicSettings; setSetting
                 story={story}
                 view={view}
                 spoilerShield={settings.spoilerShield}
+                storyDetail={settings.storyDetail}
                 continueTitle={continueNode?.title ?? null}
                 filter={filter}
                 matchCount={matchIds ? matchIds.size : null}

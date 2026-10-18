@@ -1,5 +1,5 @@
 import OpenAI from 'openai'
-import { getSettings, getApiKey } from './config'
+import { getSettings, getApiKey, contentLangName } from './config'
 import { AppError } from './errors'
 import { normalizeTree, pathTo } from '../shared/tree'
 import type { AskResult, StoryNode, StoryOutline } from '../shared/types'
@@ -27,11 +27,7 @@ function supportsTemperature(m: string): boolean {
 }
 
 function langDirective(): string {
-  const lang = getSettings().language
-  if (!lang || lang === 'auto') {
-    return 'Write in the same language the user used for the title; default to English if ambiguous.'
-  }
-  return `Write all prose in ${lang}.`
+  return `Write all prose in ${contentLangName()}.`
 }
 
 /** Pull the JSON object out of a reply, tolerating ```json fences and chatter (local models). */

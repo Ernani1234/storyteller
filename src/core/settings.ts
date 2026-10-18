@@ -1,5 +1,6 @@
 import { aiReady } from './config'
-import type { Engine, PublicSettings, Settings, SettingsPatch } from '../shared/types'
+import { UI_LANGUAGES } from '../shared/languages'
+import type { Engine, PublicSettings, Settings, SettingsPatch, UiLanguage } from '../shared/types'
 
 export const DEFAULT_SETTINGS: Settings = {
   engine: 'sources',
@@ -8,10 +9,11 @@ export const DEFAULT_SETTINGS: Settings = {
   model: 'gpt-4o-mini',
   theme: 'lavender',
   language: 'auto',
-  uiLanguage: 'auto',
+  uiLanguage: 'en',
   readingFont: 'sans',
   textScale: 1,
   spoilerShield: false,
+  storyDetail: 'complete',
   sources: { wikipedia: true, fandom: true, tvmaze: true, anilist: true },
   onboarded: false
 }
@@ -50,10 +52,11 @@ export function sanitizePatch(patch: SettingsPatch): SettingsPatch {
     out.aiBaseUrl = isWebUrl(url) ? url : ''
   }
   for (const k of ['model', 'theme', 'language'] as const) if (typeof patch[k] === 'string') out[k] = patch[k]
-  if (patch.uiLanguage === 'auto' || patch.uiLanguage === 'en' || patch.uiLanguage === 'pt') out.uiLanguage = patch.uiLanguage
+  if (UI_LANGUAGES.includes(patch.uiLanguage as UiLanguage)) out.uiLanguage = patch.uiLanguage
   if (patch.readingFont === 'sans' || patch.readingFont === 'serif') out.readingFont = patch.readingFont
   if (typeof patch.textScale === 'number') out.textScale = Math.min(1.4, Math.max(0.85, patch.textScale))
   if (typeof patch.spoilerShield === 'boolean') out.spoilerShield = patch.spoilerShield
+  if (patch.storyDetail === 'complete' || patch.storyDetail === 'local') out.storyDetail = patch.storyDetail
   if (typeof patch.onboarded === 'boolean') out.onboarded = patch.onboarded
   if (patch.sources && typeof patch.sources === 'object') {
     const s = patch.sources

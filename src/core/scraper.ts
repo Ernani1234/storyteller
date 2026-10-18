@@ -1,13 +1,14 @@
 import { getSettings, contentLang } from './config'
 import { AppError } from './errors'
 import { storyId } from './ids'
-import { labelsFor, type Labels } from './labels'
+import { fill, labelsFor, type Labels } from './labels'
 import { resolveImages } from './images'
 import * as wiki from './sources/wikipedia'
 import { getWork, classify, type WdWork, type WdRef, type MediaKind } from './sources/wikidata'
 import { getShow, type TvShow } from './sources/tvmaze'
 import { getMedia, type AniMedia } from './sources/anilist'
 import { getFandomPlot, guessFandom, pickFandom, type FandomPlot } from './sources/fandom'
+import { getEpisodeListSynopses, getSeasonSynopses, type SeasonSynopses } from './sources/seasons'
 import { chain } from '../shared/tree'
 import {
   deriveTitle,
@@ -50,6 +51,8 @@ export interface Collected {
   tv: TvShow | null
   ani: AniMedia | null
   fandom: FandomPlot | null
+  /** episode synopses from Wikipedia season articles (series) */
+  seasons: SeasonSynopses[]
   alternatives: SearchSuggestion[]
   title: string
 }
@@ -98,10 +101,12 @@ export async function collect(q: StoryQuery, progress: Progress = () => {}): Pro
     page = (await wiki.getPage(pref, wd.sitelinks[pref]).catch(() => null)) ?? page
   }
 
-  // English fallback when the local article has little or no plot.
+  // The English article too: it's the fallback when the local one has little
+  // plot, and in "most complete" mode it often tells the story at more length.
   let enPage: wiki.WikiPage | null = null
   const localPlot = page ? wiki.findPlot(page) : null
-  if (src.wikipedia && page && page.lang !== 'en' && (!localPlot || localPlot.words < 250)) {
+  const complete = s.storyDetail !== 'local'
+  if (src.wikipedia && page && page.lang !== 'en' && (complete || !localPlot || localPlot.words < 250)) {
     const enTitle = wd?.sitelinks.en
     if (enTitle) enPage = await wiki.getPage('en', enTitle).catch(() => null)
   }
@@ -115,8 +120,16 @@ export async function collect(q: StoryQuery, progress: Progress = () => {}): Pro
   const wantAni = src.anilist && (kind.anime || kind.manga || unknown)
   const aniType = kind.kind === 'manga' || (kind.manga && !kind.anime) ? 'MANGA' : 'ANIME'
   const fandomRef = src.fandom && wd ? pickFandom(wd.fandom, pref) : null
+  // Fan wikis usually tell the story at several times Wikipedia's length; the
+  // franchise's wiki is a good place to look too (Harry Potter → harrypotter.fandom.com).
+  const franchises = (wd?.series ?? []).map((r) => r.labelEn ?? r.label)
+  const tryFandom = async (): Promise<FandomPlot | null> => {
+    const byId = fandomRef ? await getFandomPlot(fandomRef).catch(() => null) : null
+    if (byId || !src.fandom || (kind.series && !kind.anime) || (!page && !wd)) return byId
+    return guessFandom(enTitle, franchises).catch(() => null)
+  }
 
-  const [tv, ani, fandomById] = await Promise.all([
+  const [tv, ani, fandom, seasons] = await Promise.all([
     wantTv
       ? getShow({ id: wd?.tvmazeId, imdb: wd?.imdb, query: unknown ? q.text : enTitle }).catch(() => null)
       : Promise.resolve(null),
@@ -127,14 +140,9 @@ export async function collect(q: StoryQuery, progress: Progress = () => {}): Pro
           type: aniType
         }).catch(() => null)
       : Promise.resolve(null),
-    fandomRef ? getFandomPlot(fandomRef).catch(() => null) : Promise.resolve(null)
+    tryFandom(),
+    kind.series && src.wikipedia && wd ? seriesSynopses(wd, pref, complete) : Promise.resolve([])
   ])
-
-  let fandom = fandomById
-  const bestWikiWords = Math.max(localPlot?.words ?? 0, enPage ? (wiki.findPlot(enPage)?.words ?? 0) : 0)
-  if (!fandom && src.fandom && (!kind.series || kind.anime) && (page || wd) && bestWikiWords < 300) {
-    fandom = await guessFandom(enTitle).catch(() => null)
-  }
 
   if (!page && !wd && !tv && !ani && !fandom) throw new AppError('NOT_FOUND', q.text)
 
@@ -145,7 +153,14 @@ export async function collect(q: StoryQuery, progress: Progress = () => {}): Pro
       ? wd.label
       : (tv?.name ?? ani?.title ?? q.text)
 
-  return { pref, page, enPage, wd, kind, tv, ani, fandom, alternatives, title }
+  return { pref, page, enPage, wd, kind, tv, ani, fandom, seasons, alternatives, title }
+}
+
+/** Season articles first (richest); otherwise the series' "List of … episodes" page. */
+async function seriesSynopses(wd: WdWork, pref: string, complete: boolean): Promise<SeasonSynopses[]> {
+  const bySeason = wd.seasons.length ? await getSeasonSynopses(wd.seasons, pref, complete).catch(() => []) : []
+  if (bySeason.length || !wd.episodeList) return bySeason
+  return getEpisodeListSynopses(wd.episodeList, pref, complete).catch(() => [])
 }
 
 // ---------------------------------------------------------------------------
@@ -164,6 +179,23 @@ function summaryOf(text: string): string {
   return truncate(splitSentences(firstPara)[0] ?? firstPara, 170)
 }
 
+/** Section names that say nothing about the chapter ("Main Story · …" on every node). */
+const GENERIC_PART = /^(main story|story|plot|synopsis|summary|storyline|walkthrough|main quest|enredo|sinopse|história)$/i
+
+/**
+ * Fandom often marks acts with a short line ("Part I", "Chapter 3") instead
+ * of a heading. Pull it out so it titles the chunk rather than being read as
+ * its first sentence (and glued to the next name: "Part I Just").
+ */
+function leadLabel(text: string): { label: string | null; text: string } {
+  const paras = splitParagraphs(text)
+  const first = paras[0] ?? ''
+  if (paras.length > 1 && wordCount(first) <= 5 && /^\p{Lu}/u.test(first) && !/[.!?:;]$/.test(first)) {
+    return { label: first, text: paras.slice(1).join('\n\n') }
+  }
+  return { label: null, text }
+}
+
 function chunksFromParts(intro: string, parts: { title: string; text: string; images?: StoryImage[] }[], L: Labels, introImages: StoryImage[] = []): Chunk[] {
   const chunks: Chunk[] = []
   const usable = parts.filter((p) => wordCount(p.text) >= 15)
@@ -175,15 +207,18 @@ function chunksFromParts(intro: string, parts: { title: string; text: string; im
       const paras = splitParagraphs(p.text)
       if (words > 650) {
         // Long section: split it, naming each piece by who/where it is about.
-        const sub = segmentParagraphs(paras, Math.ceil(words / 350), 350)
-        sub.forEach((t, i) =>
+        const sub = segmentParagraphs(paras, Math.ceil(words / 350), 350).map(leadLabel)
+        const texts = sub.map((s) => s.text)
+        const prefix = GENERIC_PART.test(p.title.trim()) ? '' : `${p.title} · `
+        sub.forEach(({ label, text }, i) => {
+          const names = deriveTitle(text, texts, `${i + 1}/${sub.length}`)
           chunks.push({
-            title: `${p.title} · ${deriveTitle(t, sub, `${i + 1}/${sub.length}`)}`,
-            text: t,
+            title: `${prefix}${label ? `${label}: ${names}` : names}`,
+            text,
             images: i === 0 ? p.images : [],
             continues: i > 0
           })
-        )
+        })
       } else {
         chunks.push({ title: p.title, text: paras.join('\n\n'), images: p.images })
       }
@@ -195,15 +230,17 @@ function chunksFromParts(intro: string, parts: { title: string; text: string; im
   // No usable sub-headings: segment the running text and title each piece by
   // the names that are distinctive to it.
   const all = [intro, ...parts.map((p) => p.text)].join('\n')
-  const segs = segmentParagraphs(splitParagraphs(all))
+  const segs = segmentParagraphs(splitParagraphs(all)).map(leadLabel)
+  const texts = segs.map((s) => s.text)
   const images = [...introImages, ...parts.flatMap((p) => p.images ?? [])]
-  segs.forEach((t, i) =>
+  segs.forEach(({ label, text }, i) => {
+    const names = deriveTitle(text, texts, fill(L.part, i + 1))
     chunks.push({
-      title: deriveTitle(t, segs, `${L.part} ${i + 1}`),
-      text: t,
+      title: label ? `${label}: ${names}` : names,
+      text,
       images: images[i] ? [images[i]] : []
     })
-  )
+  })
   return chunks
 }
 
@@ -237,9 +274,10 @@ function nodesFromTv(tv: TvShow, premise: string, L: Labels): StoryNode[] {
     if (!eps.length) continue
     const years = [...new Set([season.premiereDate, season.endDate].map((d) => d?.slice(0, 4)).filter(Boolean))]
     const named = season.name && !/^(season|temporada)\s*\d+$/i.test(season.name.trim())
-    const seasonTitle = named ? `${L.season} ${season.number}: ${season.name}` : `${L.season} ${season.number}`
+    const seasonLabel = fill(L.season, season.number)
+    const seasonTitle = named ? `${seasonLabel}: ${season.name}` : seasonLabel
     const image = season.image
-      ? [{ url: season.image, caption: `${tv.name} — ${L.season} ${season.number}`, source: season.url }]
+      ? [{ url: season.image, caption: `${tv.name} — ${seasonLabel}`, source: season.url }]
       : undefined
 
     // Long-running anime often sit in one 60+ episode "season": split it into
@@ -253,13 +291,13 @@ function nodesFromTv(tv: TvShow, premise: string, L: Labels): StoryNode[] {
       const lead = part.find((e) => e.summary)
       out.push({
         id: blocks > 1 ? `s${season.number}-${b + 1}` : `s${season.number}`,
-        title: blocks > 1 ? `${seasonTitle} · ${L.episodesCap} ${range}` : seasonTitle,
+        title: blocks > 1 ? `${seasonTitle} · ${fill(L.episodeRange, range)}` : seasonTitle,
         summary:
           blocks > 1 && lead
             ? truncate(`${lead.title}: ${lead.summary}`, 200)
             : season.summary
               ? truncate(season.summary, 200)
-              : `${part.length} ${L.episodes}${years.length ? ` · ${years.join('–')}` : ''}`,
+              : `${fill(L.episodeCount, part.length)}${years.length ? ` · ${years.join('–')}` : ''}`,
         kind: 'season',
         text: b === 0 ? season.summary : '',
         episodes: part,
@@ -314,6 +352,56 @@ function lendImages(nodes: StoryNode[], pool: StoryImage[]): StoryNode[] {
     used.add(pick.url)
     return { ...n, images: [pick] }
   })
+}
+
+/**
+ * TVMaze's episode list with the much longer Wikipedia synopses in place of
+ * its one-line blurbs — or, without TVMaze, a show built from the synopses.
+ */
+function withSynopses(tv: TvShow | null, seasons: SeasonSynopses[]): TvShow | null {
+  if (!seasons.length) return tv
+  if (!tv) {
+    return {
+      id: 0,
+      name: '',
+      url: seasons[0].url,
+      genres: [],
+      summary: '',
+      seasons: seasons.map((s) => ({ number: s.number, name: '', summary: '', url: s.url })),
+      episodes: seasons.flatMap((s) =>
+        s.episodes.map((e, i) => ({ id: `wp-${s.number}-${i + 1}`, season: s.number, number: i + 1, title: e.title, summary: e.summary, url: s.url }))
+      ),
+      cast: []
+    }
+  }
+  const bySeason = new Map(seasons.map((s) => [s.number, s]))
+  const replaced = new Map<string, { title: string; summary: string }>()
+  for (const season of tv.seasons) {
+    const syn = bySeason.get(season.number)
+    if (!syn) continue
+    const regular = tv.episodes.filter((e) => e.season === season.number && e.number !== null).sort((a, b) => a.number! - b.number!)
+    // Pair by title first; if that finds too few (translated titles), by
+    // position when the lists are nearly the same length (lists often add OVAs).
+    const key = (t: string): string => tokenize(t).join(' ')
+    let pairs = regular.map((e) => syn.episodes.find((s) => key(s.title) === key(e.title)))
+    const byTitle = pairs.filter(Boolean).length
+    const close = Math.abs(regular.length - syn.episodes.length) <= Math.max(1, Math.round(regular.length * 0.1))
+    if (byTitle < regular.length / 2 && close) pairs = regular.map((_, i) => syn.episodes[i])
+    regular.forEach((e, i) => {
+      const match = pairs[i]
+      if (match && wordCount(match.summary) > wordCount(e.summary)) {
+        replaced.set(e.id, { title: syn.lang === 'en' ? e.title : match.title || e.title, summary: match.summary })
+      }
+    })
+  }
+  return { ...tv, episodes: tv.episodes.map((e) => (replaced.has(e.id) ? { ...e, ...replaced.get(e.id)! } : e)) }
+}
+
+/** The language most of the synopses are in. */
+function synopsesLang(seasons: SeasonSynopses[]): string | undefined {
+  const count = new Map<string, number>()
+  for (const s of seasons) count.set(s.lang, (count.get(s.lang) ?? 0) + s.episodes.length)
+  return [...count.entries()].sort((a, b) => b[1] - a[1])[0]?.[0]
 }
 
 /** Give season chapters of a wiki plot their TVMaze episode lists. */
@@ -384,6 +472,10 @@ function sourcesFrom(c: Collected, used: string): SourceRef[] {
   if (c.page) out.push({ name: `Wikipedia (${c.page.lang})`, url: c.page.url, license: 'CC BY-SA 4.0' })
   if (c.enPage && used === 'wikipedia:en') out.push({ name: 'Wikipedia (en)', url: c.enPage.url, license: 'CC BY-SA 4.0' })
   if (c.fandom) out.push({ name: 'Fandom', url: c.fandom.url, license: 'CC BY-SA 3.0' })
+  if (c.seasons.length) {
+    const langs = [...new Set(c.seasons.map((s) => s.lang))].join(', ')
+    out.push({ name: `Wikipedia (${langs}) — seasons`, url: c.seasons[0].url, license: 'CC BY-SA 4.0' })
+  }
   if (c.tv) out.push({ name: 'TVMaze', url: c.tv.url, license: 'CC BY-SA 4.0' })
   if (c.ani) out.push({ name: 'AniList', url: c.ani.url })
   if (c.wd) out.push({ name: 'Wikidata', url: `https://www.wikidata.org/wiki/${c.wd.qid}`, license: 'CC0' })
@@ -400,6 +492,8 @@ function loglineFrom(c: Collected): string {
 
 interface Candidate extends PlotSourceOption {
   build: () => StoryNode[]
+  /** the plot is split by season ("Season 2", "Segunda temporada") */
+  seasonParts?: boolean
 }
 
 /** Build a complete story from collected sources — no AI involved. */
@@ -415,6 +509,7 @@ export function outlineFromCollected(c: Collected, q: StoryQuery, engine: Engine
       label: `Wikipedia (${page.lang.toUpperCase()})`,
       lang: page.lang,
       words: plot.words,
+      seasonParts: plot.parts.filter((p) => seasonNumber(p.title)).length >= 2,
       build: () => nodesFromChunks(chunksFromParts(plot.intro, plot.parts, L))
     })
   }
@@ -428,39 +523,40 @@ export function outlineFromCollected(c: Collected, q: StoryQuery, engine: Engine
       build: () => nodesFromChunks(chunksFromParts(f.intro, f.parts, labelsFor(f.lang), f.introImages))
     })
   }
-  if (c.tv?.episodes.length) {
-    const tv = c.tv
+  const show = withSynopses(c.tv, c.seasons)
+  if (show?.episodes.length) {
     const premisePlot = c.page ? wiki.findPlot(c.page) : null
-    const premise = premisePlot && premisePlot.words < 700 ? [premisePlot.intro, ...premisePlot.parts.map((p) => p.text)].join('\n') : tv.summary
-    const premiseLang = premisePlot && premisePlot.words < 700 ? c.page!.lang : 'en'
+    const premise = premisePlot && premisePlot.words < 700 ? [premisePlot.intro, ...premisePlot.parts.map((p) => p.text)].join('\n') : show.summary
     cands.push({
       id: 'tvmaze',
-      label: 'TVMaze',
-      lang: premiseLang,
-      words: tv.episodes.reduce((n, e) => n + wordCount(e.summary), 0),
-      build: () => nodesFromTv(tv, premise, labelsFor(c.pref))
+      label: c.seasons.length ? (c.tv ? 'TVMaze + Wikipedia' : 'Wikipedia') : 'TVMaze',
+      lang: synopsesLang(c.seasons) ?? (premisePlot && premisePlot.words < 700 ? c.page!.lang : 'en'),
+      words: show.episodes.reduce((n, e) => n + wordCount(e.summary), 0),
+      build: () => nodesFromTv(show, premise, labelsFor(c.pref))
     })
   }
 
-  let chosen = cands.find((x) => x.id === q.plotSource)
-  if (!chosen) {
-    const tvCand = cands.find((x) => x.id === 'tvmaze')
-    const narrative = cands.filter((x) => x.id !== 'tvmaze').sort((a, b) => b.words - a.words)
-    const local = narrative.find((x) => x.lang === c.pref)
-    const biggest = narrative[0]
-    // Series: a substantial plot in the reader's language beats English
-    // episode blurbs (episodes still get attached to its seasons below).
-    if (c.kind.series && tvCand) chosen = local && local.words >= 600 ? local : tvCand
-    else if (local && (local.words >= 250 || local.words >= (biggest?.words ?? 0) * 0.6)) chosen = local
-    else chosen = biggest ?? tvCand
-  }
+  // The fullest telling wins. Text in the reader's language gets a head start
+  // (a big one in "prefer my language" mode), and for series the season →
+  // episode structure is worth a little extra.
+  const complete = getSettings().storyDetail !== 'local'
+  // A series plot split by season also carries each season's episode list.
+  const showWords = show ? show.episodes.reduce((n, e) => n + wordCount(e.summary), 0) : 0
+  const effective = (x: Candidate): number =>
+    x.words + (c.kind.series && x.id !== 'tvmaze' && x.seasonParts ? showWords : 0)
+  const weight = (x: Candidate): number =>
+    effective(x) * (x.lang === c.pref ? 1.3 : 1) * (x.id === 'tvmaze' && c.kind.series ? 1.5 : 1)
+  const byWeight = [...cands].sort((a, b) => weight(b) - weight(a))
+  // "Prefer my language": any real plot in it wins; the fullest otherwise.
+  const localFirst = complete ? undefined : byWeight.find((x) => x.lang === c.pref && x.words >= 250)
+  const chosen = cands.find((x) => x.id === q.plotSource) ?? localFirst ?? byWeight[0]
 
   let nodes: StoryNode[]
   let notice: OutlineNotice | undefined
   let lang = c.pref
   if (chosen) {
     nodes = chosen.build()
-    if (chosen.id !== 'tvmaze' && c.tv) nodes = attachEpisodes(nodes, c.tv)
+    if (chosen.id !== 'tvmaze' && show) nodes = attachEpisodes(nodes, show)
     if (chosen.id !== 'fandom' && c.fandom) {
       nodes = lendImages(nodes, [...c.fandom.introImages, ...c.fandom.parts.flatMap((p) => p.images)])
     }
@@ -535,7 +631,11 @@ export async function detailFromSources(outline: StoryOutline, node: StoryNode):
     id: node.id,
     title: node.title,
     body,
-    beats: keySentences(body, 4),
+    // A season chapter's story is in its episodes: recap those.
+    beats:
+      wordCount(body) < 80 && node.episodes?.length
+        ? keySentences(node.episodes.map((e) => e.summary).join('\n'), 5)
+        : keySentences(body, 4),
     images,
     episodes: node.episodes,
     engine: 'sources'

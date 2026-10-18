@@ -1,7 +1,7 @@
 import { getJson, qs } from '../http'
 import { htmlToBlocks } from './html'
 import { plotScore, SKIP_PART, cleanPlotText } from './plot'
-import { wordCount } from '../../shared/text'
+import { tokenize, wordCount } from '../../shared/text'
 import type { StoryImage } from '../../shared/types'
 
 export interface FandomRef {
@@ -52,43 +52,53 @@ interface RawSections {
   error?: unknown
 }
 
-/** Fetch the plot section of a Fandom article, split by its sub-headings, with its screenshots. */
+type Section = NonNullable<RawSections['parse']>['sections'][number]
+
+/**
+ * Fetch the plot of a Fandom article, split by its sub-headings, with its
+ * screenshots. Wikis often have both a short "Synopsis" and a long "Plot":
+ * the two best candidates are read and the longer one wins.
+ */
 export async function getFandomPlot(ref: FandomRef): Promise<FandomPlot | null> {
-  const api = `${ref.base}/api.php`
   const secs = await getJson<RawSections>(
-    `${api}?${qs({ action: 'parse', format: 'json', page: ref.page, prop: 'sections', redirects: 1 })}`,
+    `${ref.base}/api.php?${qs({ action: 'parse', format: 'json', page: ref.page, prop: 'sections', redirects: 1 })}`,
     { allow404: true, timeout: 10000 }
   )
   const sections = secs?.parse?.sections ?? []
-  let best: (typeof sections)[number] | null = null
-  let bestScore = 0
-  for (const s of sections) {
-    const score = plotScore(s.line.replace(/<[^>]+>/g, '')) - (Number(s.level) - 2) * 0.5
-    if (score > bestScore) {
-      bestScore = score
-      best = s
-    }
-  }
-  if (!best) return null
+  const scored = sections
+    .map((s, i) => ({ s, i, score: plotScore(s.line.replace(/<[^>]+>/g, '')) - (Number(s.level) - 2) * 0.5 }))
+    .filter((x) => x.score >= 5)
+    .sort((a, b) => b.score - a.score || a.i - b.i)
+  if (!scored.length) return null
 
+  // A second candidate only if it isn't nested inside the first (that text is already included).
+  const first = scored[0]
+  const end = sections.findIndex((s, i) => i > first.i && Number(s.level) <= Number(first.s.level))
+  const second = scored.slice(1).find((x) => x.i < first.i || (end !== -1 && x.i >= end))
+
+  const plots = await Promise.all([first, second].filter(Boolean).map((x) => readSection(ref, x!.s)))
+  return plots.filter((p): p is FandomPlot => !!p).sort((a, b) => b.words - a.words)[0] ?? null
+}
+
+async function readSection(ref: FandomRef, section: Section): Promise<FandomPlot | null> {
   const html = await getJson<{ parse?: { text?: { '*': string } } }>(
-    `${api}?${qs({
+    `${ref.base}/api.php?${qs({
       action: 'parse',
       format: 'json',
       page: ref.page,
-      section: best.index,
+      section: section.index,
       prop: 'text',
       disableeditsection: 1,
       disablelimitreport: 1,
       redirects: 1
     })}`,
-    { timeout: 12000 }
+    { timeout: 15000 }
   )
   const raw = html?.parse?.text?.['*']
   if (!raw) return null
 
   const blocks = htmlToBlocks(raw)
-  const headLevel = Number(best.level)
+  const headLevel = Number(section.level)
   let intro = ''
   const introImages: StoryImage[] = []
   const parts: FandomPart[] = []
@@ -122,25 +132,52 @@ export async function getFandomPlot(ref: FandomRef): Promise<FandomPlot | null> 
   }
 }
 
-/**
- * No Fandom id on Wikidata? Try the obvious wiki ("Hollow Knight" →
- * hollowknight.fandom.com) and only accept it if the article has a plot.
- */
-export async function guessFandom(title: string): Promise<FandomPlot | null> {
-  const clean = title.replace(/\s*\(.*?\)\s*/g, ' ').trim()
-  const slug = clean
+const stripParens = (s: string): string => s.replace(/\s*\(.*?\)\s*/g, ' ').trim()
+
+function slugOf(name: string): string {
+  return stripParens(name)
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
     .toLowerCase()
     .replace(/^the\s+/, '')
     .replace(/[^a-z0-9]/g, '')
-  if (slug.length < 3) return null
-  for (const sub of [slug, `the${slug}`]) {
+}
+
+/** The wiki's own search, for when the article isn't named exactly like the work. */
+async function searchWiki(base: string, title: string): Promise<string[]> {
+  const d = await getJson<{ query?: { search?: { title: string }[] } }>(
+    `${base}/api.php?${qs({ action: 'query', format: 'json', list: 'search', srsearch: title, srlimit: 3, srnamespace: 0 })}`,
+    { allow404: true, timeout: 8000 }
+  )
+  const want = tokenize(title)
+  return (d?.query?.search ?? [])
+    .map((r) => r.title)
+    .filter((t) => {
+      const have = new Set(tokenize(t))
+      return want.filter((w) => have.has(w)).length >= Math.ceil(want.length * 0.7)
+    })
+}
+
+/**
+ * No Fandom id on Wikidata? Try the wikis it would plausibly live on — the
+ * work's own ("Hollow Knight" → hollowknight.fandom.com) and its franchise's
+ * ("Harry Potter and the Deathly Hallows" → harrypotter.fandom.com) — and
+ * accept one only if it has a plot for this work.
+ */
+export async function guessFandom(title: string, franchises: string[] = []): Promise<FandomPlot | null> {
+  const page = stripParens(title)
+  const subs = [...new Set([title, ...franchises].map(slugOf).filter((s) => s.length >= 3).flatMap((s) => [s, `the${s}`]))].slice(0, 6)
+  for (const sub of subs) {
+    const base = `https://${sub}.fandom.com`
     try {
-      const plot = await getFandomPlot({ base: `https://${sub}.fandom.com`, page: clean.replace(/ /g, '_'), lang: 'en' })
-      if (plot) return plot
+      const direct = await getFandomPlot({ base, page: page.replace(/ /g, '_'), lang: 'en' })
+      if (direct) return direct
+      for (const found of await searchWiki(base, page)) {
+        const plot = await getFandomPlot({ base, page: found.replace(/ /g, '_'), lang: 'en' })
+        if (plot) return plot
+      }
     } catch {
-      /* wiki doesn't exist */
+      /* no such wiki */
     }
   }
   return null

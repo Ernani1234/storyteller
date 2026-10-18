@@ -3,7 +3,7 @@ import Icon from './Icon'
 import { ENGINE_ICON } from './EngineSwitch'
 import { useI18n } from '../i18n'
 import { capFirst } from '../../../shared/text'
-import type { Engine, LibraryEntry, StoryQuery } from '../../../shared/types'
+import type { Engine, LibraryEntry, StoryQuery, UiLanguage } from '../../../shared/types'
 
 interface Props {
   library: LibraryEntry[]
@@ -15,9 +15,14 @@ interface Props {
   onImport: () => void
 }
 
-const EXAMPLES = {
+const EXAMPLES: Record<UiLanguage, string[]> = {
   en: ['The Last of Us Part II', 'Breaking Bad', 'Fullmetal Alchemist: Brotherhood', 'Interstellar', 'Pride and Prejudice', 'Hollow Knight'],
-  pt: ['The Last of Us Part II', 'Breaking Bad', 'Fullmetal Alchemist: Brotherhood', 'Interestelar', 'Dom Casmurro', 'Hollow Knight']
+  pt: ['The Last of Us Part II', 'Breaking Bad', 'Fullmetal Alchemist: Brotherhood', 'Interestelar', 'Dom Casmurro', 'Hollow Knight'],
+  es: ['The Last of Us Part II', 'Breaking Bad', 'Fullmetal Alchemist: Brotherhood', 'Interstellar', 'Don Quijote de la Mancha', 'Hollow Knight'],
+  fr: ['The Last of Us Part II', 'Breaking Bad', 'Fullmetal Alchemist: Brotherhood', 'Interstellar', 'Les Misérables', 'Hollow Knight'],
+  de: ['The Last of Us Part II', 'Breaking Bad', 'Fullmetal Alchemist: Brotherhood', 'Interstellar', 'Die Verwandlung', 'Hollow Knight'],
+  it: ['The Last of Us Part II', 'Breaking Bad', 'Fullmetal Alchemist: Brotherhood', 'Interstellar', 'I promessi sposi', 'Hollow Knight'],
+  ja: ['The Last of Us Part II', 'ブレイキング・バッド', '鋼の錬金術師 FULLMETAL ALCHEMIST', '千と千尋の神隠し', '進撃の巨人', 'Hollow Knight']
 }
 
 export default function Home({ library, engine, onSearch, onOpen, onRemove, onToggleFavorite, onImport }: Props): JSX.Element {

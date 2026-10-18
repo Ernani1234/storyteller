@@ -20,7 +20,7 @@ function Fact({ label, num, children }: { label: string; num?: boolean; children
 }
 
 export default function InfoView({ outline: o, onOpen, onPlotSource }: Props): JSX.Element {
-  const { t } = useI18n()
+  const { t, tag } = useI18n()
   const m = o.meta
 
   return (
@@ -118,7 +118,7 @@ export default function InfoView({ outline: o, onOpen, onPlotSource }: Props): J
                 >
                   <span className="source-opt__name">{s.label}</span>
                   <span className="source-opt__meta num">
-                    {s.lang.toUpperCase()} · {t('info.words', { n: s.words.toLocaleString() })}
+                    {s.lang.toUpperCase()} · {t('info.words', { n: s.words.toLocaleString(tag) })}
                   </span>
                 </button>
               ))}

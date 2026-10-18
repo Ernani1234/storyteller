@@ -24,6 +24,7 @@ const SearchBar = forwardRef<SearchBarHandle, Props>(function SearchBar({ busy, 
   const [hi, setHi] = useState(-1)
   const [loading, setLoading] = useState(false)
   const seq = useRef(0)
+  const blurTimer = useRef<number>()
 
   useImperativeHandle(ref, () => ({
     focus: () => {
@@ -108,8 +109,14 @@ const SearchBar = forwardRef<SearchBarHandle, Props>(function SearchBar({ busy, 
             setText(e.target.value)
             setOpen(true)
           }}
-          onFocus={() => setOpen(true)}
-          onBlur={() => window.setTimeout(() => setOpen(false), 120)}
+          onFocus={() => {
+            // a blur-close still pending from a quick focus-out/in must not shut the list
+            window.clearTimeout(blurTimer.current)
+            setOpen(true)
+          }}
+          onBlur={() => {
+            blurTimer.current = window.setTimeout(() => setOpen(false), 120)
+          }}
           onKeyDown={onKeyDown}
           spellCheck={false}
         />
