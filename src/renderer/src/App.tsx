@@ -461,6 +461,8 @@ function Shell({ settings, setSettings }: { settings: PublicSettings; setSetting
                     readIds={readIds}
                     matchIds={matchIds}
                     spoilerShield={settings.spoilerShield}
+                    layout={settings.mapLayout}
+                    onLayoutChange={(mapLayout) => saveSettings({ mapLayout })}
                     onSelect={(id) => openNode(id)}
                   />
                 )}

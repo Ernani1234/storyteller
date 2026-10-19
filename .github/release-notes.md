@@ -1,5 +1,11 @@
 Read the whole story of any game, film, anime, series, book or comic as a map of chapters, built from open sources (Wikipedia, Fandom, TVMaze, AniList). AI is optional: plug in an OpenAI key or a local model (Ollama, LM Studio) when you want it.
 
+## What's new in 2.0.2
+
+- **The story map reads top to bottom.** Stories without branches are now one vertical column you scroll through, instead of a zig-zag where the first and last chapters could end up next to each other. The mouse wheel scrolls the map; Ctrl + wheel zooms. If you liked the compact grid, use the new button in the map's zoom controls or **Settings → Appearance → Story map**.
+- **Better chapters for short plots.** Chapter length now follows the length of the story, so short plots with headings are no longer cut into two or three long chapters. For example, Fallout 4 now has 5 chapters instead of 3.
+- **Spoiler shield on by default** for new installs. Summaries of chapters you haven't read are blurred on the map until you hover over them. Existing installs keep their current setting.
+
 ## What's new in 2.0.1
 
 - **Fuller stories without AI.** Storyteller now picks the most complete telling of a story (often a fan wiki or the English Wikipedia) instead of the first short summary it finds. Series get a 100–200-word synopsis per episode from Wikipedia season articles and "List of episodes" pages, where TVMaze has only a line or two. To keep stories in your own language even when that version is shorter, change **Settings → Story engine → Story detail**.

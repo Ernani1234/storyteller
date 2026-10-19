@@ -12,6 +12,8 @@ export type UiLanguage = 'en' | 'pt' | 'es' | 'fr' | 'de' | 'it' | 'ja'
 export type ReadingFont = 'sans' | 'serif'
 /** complete: the longest telling of the story wins, whatever its language. local: stay in the story language when possible. */
 export type StoryDetail = 'complete' | 'local'
+/** How a story without branches is drawn: one column top to bottom, or a compact zig-zag grid. */
+export type MapLayout = 'vertical' | 'compact'
 
 export interface SourceToggles {
   wikipedia: boolean
@@ -34,6 +36,7 @@ export interface Settings {
   textScale: number
   spoilerShield: boolean
   storyDetail: StoryDetail
+  mapLayout: MapLayout
   sources: SourceToggles
   onboarded: boolean
 }

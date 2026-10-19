@@ -18,6 +18,7 @@ interface Persisted {
   textScale: number
   spoilerShield: boolean
   storyDetail: Settings['storyDetail']
+  mapLayout: Settings['mapLayout']
   sources: SourceToggles
   // engine / onboarded are intentionally NOT in defaults, so we can tell a
   // v1 user (who had a key and expects AI) apart from a fresh install.
@@ -79,6 +80,7 @@ export function getSettings(): Settings {
     textScale: store.get('textScale'),
     spoilerShield: store.get('spoilerShield'),
     storyDetail: store.get('storyDetail') ?? DEFAULT_SETTINGS.storyDetail,
+    mapLayout: store.get('mapLayout') ?? DEFAULT_SETTINGS.mapLayout,
     sources: { ...DEFAULT_SETTINGS.sources, ...store.get('sources') }
   }
 }
