@@ -1,5 +1,13 @@
 Read the whole story of any game, film, anime, series, book or comic as a map of chapters, built from open sources (Wikipedia, Fandom, TVMaze, AniList). AI is optional: plug in an OpenAI key or a local model (Ollama, LM Studio) when you want it.
 
+## What's new in 2.0.4
+
+- **Chapter pictures that belong to the story.** A chapter's pictures now come only from the work's own world: pages its Wikipedia article links to (characters, places, factions), pages titled with the work or its franchise ("Ellie (The Last of Us)"), and fan-wiki screenshots. Previously a word like "Empire" could bring in the Roman Empire.
+  - Translated stories look names up as the source wrote them.
+  - Names must match whole: "Tom" no longer finds an actor called Tom.
+  - Other works of a franchise (a film, a novel, a rulebook) are no longer used as pictures of a chapter.
+- **When nothing matches**, a chapter shows one of the work's own pictures instead: a game screenshot, a film scene, a filming location, a different one per chapter. A chapter may now have fewer pictures, but they fit.
+
 ## What's new in 2.0.3
 
 - **Stories translated into your language, no AI needed.** When the fullest telling of a story is in another language (often the English Wikipedia or a fan wiki), Storyteller now machine-translates it with Google Translate: chapter titles, text, key moments and episode summaries. A banner says the text was translated and may contain mistakes, and **Show original** switches back to the source text at any time, from the banner or the chapter panel. Questions, search and export work on the translated text, and the translation is saved with the story so it reopens offline. You can turn this off in **Settings → Story engine → Translate stories automatically**.

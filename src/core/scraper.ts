@@ -633,11 +633,18 @@ export async function detailFromSources(outline: StoryOutline, node: StoryNode):
     .slice(0, 3)
     .map((e) => ({ url: e.image!, caption: e.title, source: e.url }))
   const seed = [...(node.images ?? []), ...episodeStills]
+  // Look names up as the source wrote them: a translated "Império do Homem"
+  // finds the Roman Empire, the original "Imperium of Man" finds the faction.
+  const original = outline.translation?.nodes[node.id]
+  const nameText = original ? original.text?.trim() || original.summary : body
+  const nameLang = outline.translation?.from ?? outline.lang
   const images =
     seed.length >= 3
       ? seed.slice(0, 4)
-      : await resolveImages(properNouns(body, 3), outline.title, {
-          langs: [outline.lang, 'en'],
+      : await resolveImages(properNouns(nameText, 5), outline.title, {
+          langs: [nameLang, 'en'],
+          qid: outline.meta.qid,
+          slot: outline.nodes.indexOf(node),
           seed,
           max: 4,
           exclude: [outline.meta.poster]

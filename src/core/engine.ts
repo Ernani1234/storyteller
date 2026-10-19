@@ -124,6 +124,7 @@ export async function buildNode(
   const d = await aiNodeDetail(outline, node)
   const images = await resolveImages(d.imageQueries, outline.title, {
     langs: [outline.lang, 'en'],
+    qid: outline.meta.qid,
     seed: node.images,
     exclude: [outline.meta.poster]
   })
