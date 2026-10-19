@@ -39,6 +39,7 @@ export const it: Record<MessageKey, string> = {
   'build.step.resolve': 'Cerco l’opera',
   'build.step.sources': 'Leggo Wikipedia, Wikidata e le wiki dei fan',
   'build.step.chapters': 'Divido la trama in capitoli',
+  'build.step.translate': 'Traduco la storia nella tua lingua',
   'build.step.ai': 'L’IA sta scrivendo la mappa dei capitoli',
   'build.step.enrich': 'Aggiungo cast, locandine e link',
 
@@ -81,8 +82,12 @@ export const it: Record<MessageKey, string> = {
   'story.engine.hybrid': 'IA + fonti',
   'story.engine.ai': 'IA',
   'story.notice.thin': 'Le fonti avevano solo un breve riassunto di quest’opera. Attiva l’IA per una storia più completa.',
-  'story.notice.lang': 'La trama è stata trovata solo in {lang}. Passa il motore su Fonti + IA per leggerla nella tua lingua.',
-  'story.notice.langComplete': 'La versione più completa di questa storia è in {lang}. Per leggerla nella tua lingua, scegli «Preferisci la mia lingua» in Impostazioni → Motore delle storie, oppure usa Fonti + IA.',
+  'story.notice.lang': 'La trama è stata trovata solo in {lang}. Per leggerla nella tua lingua, attiva «Traduci automaticamente le storie» in Impostazioni → Motore delle storie, oppure usa Fonti + IA.',
+  'story.notice.langComplete': 'La versione più completa di questa storia è in {lang}. Per leggerla nella tua lingua, attiva «Traduci automaticamente le storie» oppure scegli «Preferisci la mia lingua» in Impostazioni → Motore delle storie.',
+  'story.notice.translated': 'Tradotto automaticamente con Google Traduttore (originale: {lang}). Può contenere errori.',
+  'story.notice.original': 'Testo originale ({lang}).',
+  'story.showOriginal': 'Mostra originale',
+  'story.showTranslation': 'Mostra traduzione',
   'story.find': 'Cerca nella storia',
   'story.findCount': '{n} di {total} capitoli',
   'story.clear': 'Cancella',
@@ -101,6 +106,7 @@ export const it: Record<MessageKey, string> = {
   'panel.episodes': 'Episodi',
   'panel.fromSources': 'Testo dalle fonti',
   'panel.fromAi': 'Narrato dall’IA',
+  'panel.translated': 'Tradotto (originale: {lang})',
   'panel.retry': 'Riprova',
   'panel.imagesLoading': 'Cerco immagini',
   'panel.openImage': 'Apri immagine',
@@ -188,6 +194,8 @@ export const it: Record<MessageKey, string> = {
   'settings.storyDetailDesc': 'Le wiki dei fan e la Wikipedia inglese spesso raccontano una storia con una lunghezza pari a più volte quella di un riassunto.',
   'settings.detail.complete': 'La versione più completa (può essere in inglese)',
   'settings.detail.local': 'Preferisci la mia lingua, anche se più breve',
+  'settings.autoTranslate': 'Traduci automaticamente le storie',
+  'settings.autoTranslateDesc': 'Quando la versione più completa di una storia è in un’altra lingua, viene tradotta con Google Traduttore. La traduzione automatica può contenere errori, e puoi sempre tornare all’originale.',
   'settings.lang.auto': 'Come l’interfaccia',
   'settings.sources': 'Fonti',
   'settings.sourcesDesc': 'Usate da tutti i motori per trame, locandine, cast e link.',
@@ -247,5 +255,6 @@ export const it: Record<MessageKey, string> = {
   'common.settings': 'Impostazioni',
   'common.chapter': 'Capitolo',
   'common.eps': '{n} ep.',
-  'common.generatedBy': 'Creato con Storyteller'
+  'common.generatedBy': 'Creato con Storyteller',
+  'export.translated': 'Tradotto automaticamente con Google Traduttore (originale: {lang}).'
 }

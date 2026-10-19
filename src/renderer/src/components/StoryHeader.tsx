@@ -9,6 +9,9 @@ export type View = 'tree' | 'reader' | 'characters' | 'info'
 
 interface Props {
   story: SavedStory
+  /** machine-translated story shown as originally written. */
+  showOriginal: boolean
+  onToggleOriginal: () => void
   view: View
   spoilerShield: boolean
   storyDetail: 'complete' | 'local'
@@ -120,6 +123,18 @@ export default function StoryHeader(p: Props): JSX.Element {
           </div>
         </div>
       </div>
+
+      {o.translation && (
+        <p className="notice notice--info" role="note">
+          <Icon name="globe" size={16} />
+          <span>
+            {t(p.showOriginal ? 'story.notice.original' : 'story.notice.translated', { lang: langName(o.translation.from) })}
+          </span>
+          <button className="notice__action" onClick={p.onToggleOriginal}>
+            {t(p.showOriginal ? 'story.showTranslation' : 'story.showOriginal')}
+          </button>
+        </p>
+      )}
 
       {o.notice && (
         <p className="notice" role="note">

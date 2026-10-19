@@ -37,6 +37,8 @@ export interface Settings {
   spoilerShield: boolean
   storyDetail: StoryDetail
   mapLayout: MapLayout
+  /** machine-translate stories whose fullest telling is in another language (sources engine). */
+  autoTranslate: boolean
   sources: SourceToggles
   onboarded: boolean
 }
@@ -182,6 +184,29 @@ export interface PlotSourceOption {
  */
 export type OutlineNotice = { kind: 'thin' } | { kind: 'lang'; lang: string }
 
+/** A node's text before machine translation. */
+export interface OriginalText {
+  title: string
+  summary: string
+  text?: string
+  /** episode summaries, in the node's episode order. */
+  episodes?: string[]
+}
+
+/**
+ * Set when a story was machine-translated into the reader's language. The
+ * outline then holds the translation; this keeps the original for "Show original".
+ */
+export interface StoryTranslation {
+  from: string
+  to: string
+  /** translation service, named in the notice. */
+  provider: string
+  /** original logline, when the logline was translated too. */
+  logline?: string
+  nodes: Record<string, OriginalText>
+}
+
 export interface StoryOutline {
   /** stable library id. */
   id: string
@@ -205,6 +230,7 @@ export interface StoryOutline {
   plotSources: PlotSourceOption[]
   plotSource?: string
   notice?: OutlineNotice
+  translation?: StoryTranslation
   createdAt: number
 }
 
@@ -266,7 +292,7 @@ export interface LibraryEntry {
   keys: string[]
 }
 
-export type BuildStep = 'resolve' | 'sources' | 'chapters' | 'ai' | 'enrich'
+export type BuildStep = 'resolve' | 'sources' | 'chapters' | 'translate' | 'ai' | 'enrich'
 
 export type ExportFormat = 'md' | 'pdf' | 'json'
 
@@ -276,6 +302,8 @@ export interface ExportLabels {
   sources: string
   chapter: string
   generatedBy: string
+  /** set for machine-translated stories ("Machine-translated from English…"). */
+  translated?: string
 }
 
 export interface DataInfo {

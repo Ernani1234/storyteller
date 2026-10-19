@@ -3,6 +3,7 @@ import { AppError } from './errors'
 import { storyId } from './ids'
 import { fill, labelsFor, type Labels } from './labels'
 import { resolveImages } from './images'
+import { translateOutline } from './translate'
 import * as wiki from './sources/wikipedia'
 import { getWork, classify, type WdWork, type WdRef, type MediaKind } from './sources/wikidata'
 import { getShow, type TvShow } from './sources/tvmaze'
@@ -535,7 +536,9 @@ export function outlineFromCollected(c: Collected, q: StoryQuery, engine: Engine
     cands.push({
       id: 'tvmaze',
       label: c.seasons.length ? (c.tv ? 'TVMaze + Wikipedia' : 'Wikipedia') : 'TVMaze',
-      lang: synopsesLang(c.seasons) ?? (premisePlot && premisePlot.words < 700 ? c.page!.lang : 'en'),
+      // The words counted are the episodes': TVMaze's are English unless season
+      // synopses replaced them. (A local premise doesn't make the plot local.)
+      lang: synopsesLang(c.seasons) ?? 'en',
       words: show.episodes.reduce((n, e) => n + wordCount(e.summary), 0),
       build: () => nodesFromTv(show, premise, labelsFor(c.pref))
     })
@@ -612,7 +615,14 @@ export function outlineFromCollected(c: Collected, q: StoryQuery, engine: Engine
 export async function outlineFromSources(q: StoryQuery, progress: Progress): Promise<StoryOutline> {
   const c = await collect(q, progress)
   progress('chapters')
-  return outlineFromCollected(c, q)
+  const outline = outlineFromCollected(c, q)
+  if (!getSettings().autoTranslate || outline.lang === c.pref) return outline
+
+  // The fullest telling is in another language: machine-translate it. If the
+  // service is unreachable, keep the original and its "found in English" notice.
+  progress('translate')
+  const loglineLang = c.page?.lead ? c.page.lang : 'en'
+  return translateOutline(outline, c.pref, loglineLang).catch(() => outline)
 }
 
 /** Chapter detail for a sources-built node: the scraped text plus images and key moments. */

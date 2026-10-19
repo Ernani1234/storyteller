@@ -17,6 +17,7 @@ import { ToastProvider, useToast } from './components/Toasts'
 import { I18nProvider, useI18n } from './i18n'
 import { applyAppearance, SYSTEM_THEME } from './themes'
 import { stopSpeaking } from './lib/tts'
+import { originalDetail, originalOutline } from './lib/translation'
 import { readingOrder } from '../../shared/tree'
 import { fold } from '../../shared/text'
 import type {
@@ -67,7 +68,7 @@ export default function App(): JSX.Element {
 }
 
 function Shell({ settings, setSettings }: { settings: PublicSettings; setSettings: (s: PublicSettings) => void }): JSX.Element {
-  const { t } = useI18n()
+  const { t, langName } = useI18n()
   const toast = useToast()
   const search = useRef<SearchBarHandle>(null)
 
@@ -128,7 +129,20 @@ function Shell({ settings, setSettings }: { settings: PublicSettings; setSetting
   }
 
   // ---- derived -----------------------------------------------------------
-  const order = useMemo(() => (story ? readingOrder(story.outline.nodes) : []), [story?.outline])
+  // Machine-translated stories can be shown as originally written.
+  const [showOriginal, setShowOriginal] = useState(false)
+  useEffect(() => setShowOriginal(false), [story?.outline.id])
+  const original = showOriginal && !!story?.outline.translation
+  const shown = useMemo(() => (story && original ? originalOutline(story.outline) : story?.outline), [story?.outline, original])
+  const shownDetails = useMemo(
+    () =>
+      story && original
+        ? Object.fromEntries(Object.entries(story.details).map(([id, d]) => [id, originalDetail(d, story.outline)]))
+        : (story?.details ?? {}),
+    [story?.details, story?.outline, original]
+  )
+
+  const order = useMemo(() => (shown ? readingOrder(shown.nodes) : []), [shown])
   const readIds = useMemo(() => new Set(story?.read ?? []), [story?.read])
   const loadingIds = useMemo(
     () => new Set(Object.entries(status).filter(([, s]) => s.loading).map(([id]) => id)),
@@ -136,16 +150,17 @@ function Shell({ settings, setSettings }: { settings: PublicSettings; setSetting
   )
   const matchIds = useMemo(() => {
     const q = fold(filter.trim())
-    if (!story || q.length < 2) return null
+    if (!shown || q.length < 2) return null
+    // Search what is on screen: the translation, or the original when shown.
     const ids = new Set<string>()
-    for (const n of story.outline.nodes) {
+    for (const n of shown.nodes) {
       const hay = fold(
-        [n.title, n.summary, story.details[n.id]?.body ?? n.text ?? '', ...(n.episodes ?? []).map((e) => `${e.title} ${e.summary}`)].join(' ')
+        [n.title, n.summary, shownDetails[n.id]?.body ?? n.text ?? '', ...(n.episodes ?? []).map((e) => `${e.title} ${e.summary}`)].join(' ')
       )
       if (hay.includes(q)) ids.add(n.id)
     }
     return ids
-  }, [filter, story?.outline, story?.details])
+  }, [filter, shown, shownDetails])
 
   const activeIndex = order.findIndex((n) => n.id === activeId)
   const activeNode = activeIndex >= 0 ? order[activeIndex] : undefined
@@ -287,6 +302,8 @@ function Shell({ settings, setSettings }: { settings: PublicSettings; setSetting
     // Local answers quote the related chapter; AI answers quote the current one.
     const node = a.engine === 'ai' ? activeId : a.relatedNodeId
     setHighlight(a.highlight && node ? { nodeId: node, text: a.highlight } : null)
+    // Answers quote the translated text: show it, so the highlight can be found.
+    if (a.highlight) setShowOriginal(false)
     if (a.relatedNodeId) blink(a.relatedNodeId)
   }
 
@@ -311,7 +328,8 @@ function Shell({ settings, setSettings }: { settings: PublicSettings; setSetting
       episodes: t('panel.episodes'),
       sources: t('info.sources'),
       chapter: t('common.chapter'),
-      generatedBy: t('common.generatedBy')
+      generatedBy: t('common.generatedBy'),
+      translated: s.outline.translation ? t('export.translated', { lang: langName(s.outline.translation.from) }) : undefined
     })
     if (!res.ok) toast({ tone: 'error', message: res.error ?? '' })
     else if (res.data) toast({ tone: 'success', message: t('story.exported', { path: res.data }) })
@@ -437,7 +455,9 @@ function Shell({ settings, setSettings }: { settings: PublicSettings; setSetting
           <div className={`workspace ${showPanel ? 'has-panel' : ''}`}>
             <div className="canvas">
               <StoryHeader
-                story={story}
+                story={shown ? { ...story, outline: shown } : story}
+                showOriginal={original}
+                onToggleOriginal={() => setShowOriginal((v) => !v)}
                 view={view}
                 spoilerShield={settings.spoilerShield}
                 storyDetail={settings.storyDetail}
@@ -455,7 +475,7 @@ function Shell({ settings, setSettings }: { settings: PublicSettings; setSetting
               <div className="canvas__body">
                 {view === 'tree' && (
                   <StoryTree
-                    outline={story.outline}
+                    outline={shown ?? story.outline}
                     activeId={activeId}
                     blinkId={blinkId}
                     readIds={readIds}
@@ -469,7 +489,7 @@ function Shell({ settings, setSettings }: { settings: PublicSettings; setSetting
                 {view === 'reader' && (
                   <ReaderView
                     order={order}
-                    details={story.details}
+                    details={shownDetails}
                     readIds={readIds}
                     matchIds={matchIds}
                     loadingIds={loadingIds}
@@ -503,11 +523,13 @@ function Shell({ settings, setSettings }: { settings: PublicSettings; setSetting
 
             {showPanel && activeNode && (
               <NodePanel
-                outline={story.outline}
+                outline={shown ?? story.outline}
                 node={activeNode}
                 index={activeIndex}
                 total={order.length}
-                detail={story.details[activeNode.id]}
+                detail={shownDetails[activeNode.id]}
+                showOriginal={original}
+                onToggleOriginal={() => setShowOriginal((v) => !v)}
                 loading={!!panelStatus?.loading}
                 error={panelStatus?.error}
                 highlight={highlight?.nodeId === activeNode.id ? highlight.text : null}

@@ -1,5 +1,12 @@
 Read the whole story of any game, film, anime, series, book or comic as a map of chapters, built from open sources (Wikipedia, Fandom, TVMaze, AniList). AI is optional: plug in an OpenAI key or a local model (Ollama, LM Studio) when you want it.
 
+## What's new in 2.0.3
+
+- **Stories translated into your language, no AI needed.** When the fullest telling of a story is in another language (often the English Wikipedia or a fan wiki), Storyteller now machine-translates it with Google Translate: chapter titles, text, key moments and episode summaries. A banner says the text was translated and may contain mistakes, and **Show original** switches back to the source text at any time, from the banner or the chapter panel. Questions, search and export work on the translated text, and the translation is saved with the story so it reopens offline. You can turn this off in **Settings → Story engine → Translate stories automatically**.
+- **Series with English-only episodes are labeled correctly.** Shows like Arcane were marked as being in your language because of a local premise, even though every episode summary was in English. Those episodes are now translated too, and the parts already in your language are left as written.
+
+Stories already in your library aren't translated automatically. Search for one and choose **Build again** to translate it.
+
 ## What's new in 2.0.2
 
 - **The story map reads top to bottom.** Stories without branches are now one vertical column you scroll through, instead of a zig-zag where the first and last chapters could end up next to each other. The mouse wheel scrolls the map; Ctrl + wheel zooms. If you liked the compact grid, use the new button in the map's zoom controls or **Settings → Appearance → Story map**.

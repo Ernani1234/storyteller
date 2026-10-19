@@ -102,6 +102,7 @@ export default function SettingsModal({ settings, section: initial, onClose, onS
       spoilerShield: draft.spoilerShield,
       storyDetail: draft.storyDetail,
       mapLayout: draft.mapLayout,
+      autoTranslate: draft.autoTranslate,
       sources: draft.sources
     }
     if (keyInput.trim()) patch.apiKey = keyInput.trim()
@@ -251,6 +252,13 @@ export default function SettingsModal({ settings, section: initial, onClose, onS
                       <option value="local">{t('settings.detail.local')}</option>
                     </select>
                     <span className="hint">{t('settings.storyDetailDesc')}</span>
+                  </label>
+                  <label className="switch-row">
+                    <span>
+                      <span className="switch-row__label">{t('settings.autoTranslate')}</span>
+                      <span className="switch-row__desc">{t('settings.autoTranslateDesc')}</span>
+                    </span>
+                    <input type="checkbox" className="switch" checked={draft.autoTranslate} onChange={(e) => set('autoTranslate', e.target.checked)} />
                   </label>
                 </section>
 

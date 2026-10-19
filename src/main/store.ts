@@ -19,6 +19,7 @@ interface Persisted {
   spoilerShield: boolean
   storyDetail: Settings['storyDetail']
   mapLayout: Settings['mapLayout']
+  autoTranslate: boolean
   sources: SourceToggles
   // engine / onboarded are intentionally NOT in defaults, so we can tell a
   // v1 user (who had a key and expects AI) apart from a fresh install.
@@ -81,6 +82,7 @@ export function getSettings(): Settings {
     spoilerShield: store.get('spoilerShield'),
     storyDetail: store.get('storyDetail') ?? DEFAULT_SETTINGS.storyDetail,
     mapLayout: store.get('mapLayout') ?? DEFAULT_SETTINGS.mapLayout,
+    autoTranslate: store.get('autoTranslate') ?? DEFAULT_SETTINGS.autoTranslate,
     sources: { ...DEFAULT_SETTINGS.sources, ...store.get('sources') }
   }
 }

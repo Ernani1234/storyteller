@@ -15,6 +15,7 @@ export const DEFAULT_SETTINGS: Settings = {
   spoilerShield: true,
   storyDetail: 'complete',
   mapLayout: 'vertical',
+  autoTranslate: true,
   sources: { wikipedia: true, fandom: true, tvmaze: true, anilist: true },
   onboarded: false
 }
@@ -59,6 +60,7 @@ export function sanitizePatch(patch: SettingsPatch): SettingsPatch {
   if (typeof patch.spoilerShield === 'boolean') out.spoilerShield = patch.spoilerShield
   if (patch.storyDetail === 'complete' || patch.storyDetail === 'local') out.storyDetail = patch.storyDetail
   if (patch.mapLayout === 'vertical' || patch.mapLayout === 'compact') out.mapLayout = patch.mapLayout
+  if (typeof patch.autoTranslate === 'boolean') out.autoTranslate = patch.autoTranslate
   if (typeof patch.onboarded === 'boolean') out.onboarded = patch.onboarded
   if (patch.sources && typeof patch.sources === 'object') {
     const s = patch.sources

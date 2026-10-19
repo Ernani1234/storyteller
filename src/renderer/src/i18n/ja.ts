@@ -39,6 +39,7 @@ export const ja: Record<MessageKey, string> = {
   'build.step.resolve': '作品を特定しています',
   'build.step.sources': 'Wikipedia、Wikidata、ファン Wiki を読んでいます',
   'build.step.chapters': 'あらすじを章に分けています',
+  'build.step.translate': '物語をあなたの言語に翻訳しています',
   'build.step.ai': 'AI が章のマップを書いています',
   'build.step.enrich': 'キャスト、ポスター、リンクを追加しています',
 
@@ -81,8 +82,12 @@ export const ja: Record<MessageKey, string> = {
   'story.engine.hybrid': 'AI + 情報源',
   'story.engine.ai': 'AI',
   'story.notice.thin': '情報源にはこの作品の短い要約しかありませんでした。AI をオンにすると、より詳しい物語になります。',
-  'story.notice.lang': 'あらすじは{lang}でしか見つかりませんでした。エンジンを「情報源 + AI」にすると、あなたの言語で読めます。',
-  'story.notice.langComplete': 'この物語の最も詳しい版は{lang}です。あなたの言語で読むには、設定 → ストーリーエンジンで「自分の言語を優先」を選ぶか、「情報源 + AI」を使ってください。',
+  'story.notice.lang': 'あらすじは{lang}でしか見つかりませんでした。あなたの言語で読むには、設定 → ストーリーエンジンで「物語を自動翻訳する」をオンにするか、「情報源 + AI」を使ってください。',
+  'story.notice.langComplete': 'この物語の最も詳しい版は{lang}です。あなたの言語で読むには、設定 → ストーリーエンジンで「物語を自動翻訳する」をオンにするか、「自分の言語を優先」を選んでください。',
+  'story.notice.translated': 'Google 翻訳で{lang}から自動翻訳しました。誤りが含まれる場合があります。',
+  'story.notice.original': '原文（{lang}）を表示しています。',
+  'story.showOriginal': '原文を表示',
+  'story.showTranslation': '翻訳を表示',
   'story.find': '物語内を検索',
   'story.findCount': '{total} 章中 {n} 章',
   'story.clear': 'クリア',
@@ -101,6 +106,7 @@ export const ja: Record<MessageKey, string> = {
   'panel.episodes': 'エピソード',
   'panel.fromSources': '情報源のテキスト',
   'panel.fromAi': 'AI によるナレーション',
+  'panel.translated': '{lang}から翻訳',
   'panel.retry': '再試行',
   'panel.imagesLoading': '画像を探しています',
   'panel.openImage': '画像を開く',
@@ -188,6 +194,8 @@ export const ja: Record<MessageKey, string> = {
   'settings.storyDetailDesc': 'ファン Wiki や英語版 Wikipedia は、要約の何倍もの長さで物語を記していることがよくあります。',
   'settings.detail.complete': '最も詳しい版（英語の場合あり）',
   'settings.detail.local': '短くても自分の言語を優先',
+  'settings.autoTranslate': '物語を自動翻訳する',
+  'settings.autoTranslateDesc': '物語の最も詳しい版が別の言語の場合、Google 翻訳で翻訳します。機械翻訳には誤りが含まれることがありますが、いつでも原文に切り替えられます。',
   'settings.lang.auto': '表示言語と同じ',
   'settings.sources': '情報源',
   'settings.sourcesDesc': 'すべてのエンジンが、あらすじ、ポスター、キャスト、リンクに使います。',
@@ -247,5 +255,6 @@ export const ja: Record<MessageKey, string> = {
   'common.settings': '設定',
   'common.chapter': '章',
   'common.eps': '{n} 話',
-  'common.generatedBy': 'Storyteller で作成'
+  'common.generatedBy': 'Storyteller で作成',
+  'export.translated': 'Google 翻訳で{lang}から自動翻訳。'
 }
