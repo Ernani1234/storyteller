@@ -1,6 +1,6 @@
 import { normalizeTree, readingOrder } from '../shared/tree'
 import { splitParagraphs } from '../shared/text'
-import type { Engine, ExportLabels, SavedStory, StoryOutline } from '../shared/types'
+import type { Engine, ExportLabels, OriginalText, SavedStory, StoryOutline, StoryTranslation } from '../shared/types'
 
 /**
  * Export formats shared by every host. The desktop wraps them in save dialogs
@@ -35,6 +35,7 @@ export function toMarkdown(story: SavedStory, L: ExportLabels): string {
   const o = story.outline
   const out = [`# ${o.title}`, '', `_${subtitle(o)}_`, '']
   if (o.logline) out.push(`> ${o.logline}`, '')
+  if (L.translated) out.push(`_${L.translated}_`, '')
   for (const c of chapters(story)) {
     out.push(`## ${c.index}. ${c.title}`, '', ...splitParagraphs(c.body).flatMap((p) => [p, '']))
     if (c.beats.length) out.push(`**${L.keyMoments}**`, '', ...c.beats.map((b) => `- ${b}`), '')
@@ -80,6 +81,7 @@ export function toHtml(story: SavedStory, L: ExportLabels): string {
 <header>${o.meta.poster ? `<img src="${esc(o.meta.poster)}" alt="">` : ''}<div>
   <h1>${esc(o.title)}</h1><div class="sub">${esc(subtitle(o))}</div>
   ${o.logline ? `<blockquote>${esc(o.logline)}</blockquote>` : ''}
+  ${L.translated ? `<div class="sub">${esc(L.translated)}</div>` : ''}
 </div></header>
 ${body}
 <footer>${o.sources.length ? `${esc(L.sources)}: ${o.sources.map((s) => `<a href="${esc(s.url)}">${esc(s.name)}</a>${s.license ? ` (${esc(s.license)})` : ''}`).join(' · ')}<br>` : ''}${esc(L.generatedBy)}</footer>
@@ -91,6 +93,24 @@ export function toJson(story: SavedStory): string {
 }
 
 const ENGINES: Engine[] = ['sources', 'hybrid', 'ai']
+
+/** The original text of a machine-translated story, keeping only well-formed strings. */
+function parseTranslation(raw: unknown, ids: Set<string>): StoryTranslation | undefined {
+  const t = raw as Partial<StoryTranslation> | undefined
+  if (!t || typeof t.from !== 'string' || typeof t.to !== 'string' || !t.nodes || typeof t.nodes !== 'object') return undefined
+  const str = (v: unknown): string | undefined => (typeof v === 'string' ? v : undefined)
+  const nodes: Record<string, OriginalText> = {}
+  for (const [id, n] of Object.entries(t.nodes)) {
+    if (!ids.has(id) || !n || typeof n.title !== 'string') continue
+    nodes[id] = {
+      title: n.title,
+      summary: str(n.summary) ?? '',
+      text: str(n.text),
+      episodes: Array.isArray(n.episodes) ? n.episodes.map((e) => String(e ?? '')) : undefined
+    }
+  }
+  return { from: t.from, to: t.to, provider: str(t.provider) ?? '', logline: str(t.logline), nodes }
+}
 
 /** Read a story exported as JSON, defensively: it is untrusted input. */
 export function parseImported(text: string): SavedStory {
@@ -120,6 +140,7 @@ export function parseImported(text: string): SavedStory {
     sources: Array.isArray(o.sources) ? o.sources : [],
     alternatives: [],
     plotSources: [],
+    translation: parseTranslation(o.translation, new Set(nodes.map((n) => n.id))),
     createdAt: Number(o.createdAt) || Date.now()
   }
   const ids = new Set(nodes.map((n) => n.id))

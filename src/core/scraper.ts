@@ -3,6 +3,7 @@ import { AppError } from './errors'
 import { storyId } from './ids'
 import { fill, labelsFor, type Labels } from './labels'
 import { resolveImages } from './images'
+import { translateOutline } from './translate'
 import * as wiki from './sources/wikipedia'
 import { getWork, classify, type WdWork, type WdRef, type MediaKind } from './sources/wikidata'
 import { getShow, type TvShow } from './sources/tvmaze'
@@ -535,7 +536,9 @@ export function outlineFromCollected(c: Collected, q: StoryQuery, engine: Engine
     cands.push({
       id: 'tvmaze',
       label: c.seasons.length ? (c.tv ? 'TVMaze + Wikipedia' : 'Wikipedia') : 'TVMaze',
-      lang: synopsesLang(c.seasons) ?? (premisePlot && premisePlot.words < 700 ? c.page!.lang : 'en'),
+      // The words counted are the episodes': TVMaze's are English unless season
+      // synopses replaced them. (A local premise doesn't make the plot local.)
+      lang: synopsesLang(c.seasons) ?? 'en',
       words: show.episodes.reduce((n, e) => n + wordCount(e.summary), 0),
       build: () => nodesFromTv(show, premise, labelsFor(c.pref))
     })
@@ -612,7 +615,14 @@ export function outlineFromCollected(c: Collected, q: StoryQuery, engine: Engine
 export async function outlineFromSources(q: StoryQuery, progress: Progress): Promise<StoryOutline> {
   const c = await collect(q, progress)
   progress('chapters')
-  return outlineFromCollected(c, q)
+  const outline = outlineFromCollected(c, q)
+  if (!getSettings().autoTranslate || outline.lang === c.pref) return outline
+
+  // The fullest telling is in another language: machine-translate it. If the
+  // service is unreachable, keep the original and its "found in English" notice.
+  progress('translate')
+  const loglineLang = c.page?.lead ? c.page.lang : 'en'
+  return translateOutline(outline, c.pref, loglineLang).catch(() => outline)
 }
 
 /** Chapter detail for a sources-built node: the scraped text plus images and key moments. */
@@ -623,11 +633,18 @@ export async function detailFromSources(outline: StoryOutline, node: StoryNode):
     .slice(0, 3)
     .map((e) => ({ url: e.image!, caption: e.title, source: e.url }))
   const seed = [...(node.images ?? []), ...episodeStills]
+  // Look names up as the source wrote them: a translated "Império do Homem"
+  // finds the Roman Empire, the original "Imperium of Man" finds the faction.
+  const original = outline.translation?.nodes[node.id]
+  const nameText = original ? original.text?.trim() || original.summary : body
+  const nameLang = outline.translation?.from ?? outline.lang
   const images =
     seed.length >= 3
       ? seed.slice(0, 4)
-      : await resolveImages(properNouns(body, 3), outline.title, {
-          langs: [outline.lang, 'en'],
+      : await resolveImages(properNouns(nameText, 5), outline.title, {
+          langs: [nameLang, 'en'],
+          qid: outline.meta.qid,
+          slot: outline.nodes.indexOf(node),
           seed,
           max: 4,
           exclude: [outline.meta.poster]

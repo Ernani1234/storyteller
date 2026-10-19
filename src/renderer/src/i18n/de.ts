@@ -39,6 +39,7 @@ export const de: Record<MessageKey, string> = {
   'build.step.resolve': 'Werk wird gesucht',
   'build.step.sources': 'Wikipedia, Wikidata und Fan-Wikis werden gelesen',
   'build.step.chapters': 'Handlung wird in Kapitel geteilt',
+  'build.step.translate': 'Geschichte wird in deine Sprache übersetzt',
   'build.step.ai': 'Die KI schreibt die Kapitelkarte',
   'build.step.enrich': 'Besetzung, Poster und Links werden ergänzt',
 
@@ -81,8 +82,12 @@ export const de: Record<MessageKey, string> = {
   'story.engine.hybrid': 'KI + Quellen',
   'story.engine.ai': 'KI',
   'story.notice.thin': 'Die Quellen hatten nur eine kurze Zusammenfassung dieses Werks. Schalte die KI ein für eine ausführlichere Geschichte.',
-  'story.notice.lang': 'Die Handlung wurde nur auf {lang} gefunden. Stell die Engine auf Quellen + KI, um sie in deiner Sprache zu lesen.',
-  'story.notice.langComplete': 'Die ausführlichste Fassung dieser Geschichte ist auf {lang}. Um sie in deiner Sprache zu lesen, wähl „Meine Sprache bevorzugen“ unter Einstellungen → Erzähl-Engine oder nutze Quellen + KI.',
+  'story.notice.lang': 'Die Handlung wurde nur auf {lang} gefunden. Um sie in deiner Sprache zu lesen, schalte „Geschichten automatisch übersetzen“ unter Einstellungen → Erzähl-Engine ein oder nutze Quellen + KI.',
+  'story.notice.langComplete': 'Die ausführlichste Fassung dieser Geschichte ist auf {lang}. Um sie in deiner Sprache zu lesen, schalte „Geschichten automatisch übersetzen“ ein oder wähl „Meine Sprache bevorzugen“ unter Einstellungen → Erzähl-Engine.',
+  'story.notice.translated': 'Automatisch mit Google Übersetzer übersetzt (Original: {lang}). Kann Fehler enthalten.',
+  'story.notice.original': 'Originaltext wird angezeigt ({lang}).',
+  'story.showOriginal': 'Original anzeigen',
+  'story.showTranslation': 'Übersetzung anzeigen',
   'story.find': 'In der Geschichte suchen',
   'story.findCount': '{n} von {total} Kapiteln',
   'story.clear': 'Löschen',
@@ -101,6 +106,7 @@ export const de: Record<MessageKey, string> = {
   'panel.episodes': 'Folgen',
   'panel.fromSources': 'Text aus den Quellen',
   'panel.fromAi': 'Von der KI erzählt',
+  'panel.translated': 'Übersetzt (Original: {lang})',
   'panel.retry': 'Erneut versuchen',
   'panel.imagesLoading': 'Bilder werden gesucht',
   'panel.openImage': 'Bild öffnen',
@@ -188,6 +194,8 @@ export const de: Record<MessageKey, string> = {
   'settings.storyDetailDesc': 'Fan-Wikis und die englische Wikipedia erzählen eine Geschichte oft um ein Vielfaches länger als eine Zusammenfassung.',
   'settings.detail.complete': 'Die ausführlichste Fassung (evtl. auf Englisch)',
   'settings.detail.local': 'Meine Sprache bevorzugen, auch wenn kürzer',
+  'settings.autoTranslate': 'Geschichten automatisch übersetzen',
+  'settings.autoTranslateDesc': 'Wenn die ausführlichste Fassung einer Geschichte in einer anderen Sprache vorliegt, wird sie mit Google Übersetzer übersetzt. Maschinelle Übersetzungen können Fehler enthalten, und du kannst jederzeit zum Original wechseln.',
   'settings.lang.auto': 'Wie die Oberfläche',
   'settings.sources': 'Quellen',
   'settings.sourcesDesc': 'Werden von jeder Engine für Handlung, Poster, Besetzung und Links genutzt.',
@@ -247,5 +255,6 @@ export const de: Record<MessageKey, string> = {
   'common.settings': 'Einstellungen',
   'common.chapter': 'Kapitel',
   'common.eps': '{n} Folgen',
-  'common.generatedBy': 'Erstellt mit Storyteller'
+  'common.generatedBy': 'Erstellt mit Storyteller',
+  'export.translated': 'Automatisch mit Google Übersetzer übersetzt (Original: {lang}).'
 }

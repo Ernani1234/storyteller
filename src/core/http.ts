@@ -46,6 +46,8 @@ export interface GetJsonOptions {
   timeout?: number
   method?: 'GET' | 'POST'
   body?: unknown
+  /** form-encoded POST body; a repeated field is an array. */
+  form?: Record<string, string | string[]>
   headers?: Record<string, string>
   /** resolve null instead of throwing on 404. */
   allow404?: boolean
@@ -67,7 +69,11 @@ export async function getJson<T = any>(url: string, opts: GetJsonOptions = {}): 
     url += `${url.includes('?') ? '&' : '?'}origin=*`
   }
   const ttl = opts.ttl ?? 7 * DAY
-  const bodyStr = opts.body === undefined ? '' : JSON.stringify(opts.body)
+  const form = opts.form ? new URLSearchParams() : null
+  if (opts.form && form) {
+    for (const [k, v] of Object.entries(opts.form)) for (const item of Array.isArray(v) ? v : [v]) form.append(k, item)
+  }
+  const bodyStr = form ? form.toString() : opts.body === undefined ? '' : JSON.stringify(opts.body)
   const key = hashHex(`${opts.method ?? 'GET'} ${url} ${bodyStr}`)
 
   let stale: CacheEntry | null = null
@@ -87,7 +93,7 @@ export async function getJson<T = any>(url: string, opts: GetJsonOptions = {}): 
         // CORS preflight); native hosts identify themselves as Wikimedia asks.
         ...(browser ? {} : { 'User-Agent': UA }),
         Accept: 'application/json',
-        ...(bodyStr ? { 'Content-Type': 'application/json' } : {}),
+        ...(bodyStr ? { 'Content-Type': form ? 'application/x-www-form-urlencoded;charset=UTF-8' : 'application/json' } : {}),
         ...opts.headers
       },
       body: bodyStr || undefined,

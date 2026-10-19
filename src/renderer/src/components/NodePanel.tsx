@@ -36,6 +36,9 @@ interface Props {
   onGoTo: (nodeId: string) => void
   onBlink: (nodeId: string) => void
   onImage: (images: StoryImage[], index: number) => void
+  /** machine-translated story shown as originally written. */
+  showOriginal: boolean
+  onToggleOriginal: () => void
 }
 
 /** Paragraph with an optional highlighted passage (case/whitespace-insensitive). */
@@ -92,7 +95,7 @@ function EpisodeList({ episodes, highlight }: { episodes: Episode[]; highlight: 
 }
 
 export default function NodePanel(p: Props): JSX.Element {
-  const { t } = useI18n()
+  const { t, langName } = useI18n()
   const [question, setQuestion] = useState('')
   const [asking, setAsking] = useState(false)
   const [answer, setAnswer] = useState<AskResult | null>(null)
@@ -285,6 +288,14 @@ export default function NodePanel(p: Props): JSX.Element {
               <Icon name={p.detail?.engine === 'ai' ? 'sparkles' : 'book'} size={13} />
               {p.detail?.engine === 'ai' ? t('panel.fromAi') : t('panel.fromSources')}
             </span>
+            {p.outline.translation && p.detail?.engine !== 'ai' && (
+              <button type="button" className="chip chip--btn chip--accent" onClick={p.onToggleOriginal}>
+                <Icon name="globe" size={13} />
+                {p.showOriginal
+                  ? t('story.showTranslation')
+                  : `${t('panel.translated', { lang: langName(p.outline.translation.from) })} · ${t('story.showOriginal')}`}
+              </button>
+            )}
             {p.outline.sources
               .filter((s) => s.name !== 'Wikidata')
               .map((s) => (

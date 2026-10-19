@@ -10,7 +10,8 @@ const STEPS: Record<Engine, BuildStep[]> = {
 
 export function BuildState({ query, step, engine }: { query: string; step: BuildStep | null; engine: Engine }): JSX.Element {
   const { t } = useI18n()
-  const steps = STEPS[engine]
+  // Translation only happens when the fullest telling is in another language.
+  const steps = step === 'translate' ? [...STEPS[engine], step] : STEPS[engine]
   const current = step ? steps.indexOf(step) : 0
   return (
     <div className="status" aria-busy="true">

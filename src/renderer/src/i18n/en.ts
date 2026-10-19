@@ -37,6 +37,7 @@ export const en = {
   'build.step.resolve': 'Finding the work',
   'build.step.sources': 'Reading Wikipedia, Wikidata and fan wikis',
   'build.step.chapters': 'Splitting the plot into chapters',
+  'build.step.translate': 'Translating the story into your language',
   'build.step.ai': 'The AI is writing the chapter map',
   'build.step.enrich': 'Adding cast, posters and links',
 
@@ -79,8 +80,12 @@ export const en = {
   'story.engine.hybrid': 'AI + sources',
   'story.engine.ai': 'AI',
   'story.notice.thin': 'The sources only had a short summary of this work. Turn on AI for a fuller story.',
-  'story.notice.lang': 'The plot was only found in {lang}. Switch the engine to Sources + AI to read it in your language.',
-  'story.notice.langComplete': 'The most complete telling of this story is in {lang}. To read it in your language, pick “Prefer my language” in Settings → Story engine, or use Sources + AI.',
+  'story.notice.lang': 'The plot was only found in {lang}. To read it in your language, turn on “Translate stories automatically” in Settings → Story engine, or use Sources + AI.',
+  'story.notice.langComplete': 'The most complete telling of this story is in {lang}. To read it in your language, turn on “Translate stories automatically” or pick “Prefer my language” in Settings → Story engine.',
+  'story.notice.translated': 'Machine-translated from {lang} with Google Translate. It may contain mistakes.',
+  'story.notice.original': 'Showing the original text in {lang}.',
+  'story.showOriginal': 'Show original',
+  'story.showTranslation': 'Show translation',
   'story.find': 'Find in story',
   'story.findCount': '{n} of {total} chapters',
   'story.clear': 'Clear',
@@ -99,6 +104,7 @@ export const en = {
   'panel.episodes': 'Episodes',
   'panel.fromSources': 'Text from the sources',
   'panel.fromAi': 'Narrated by AI',
+  'panel.translated': 'Translated from {lang}',
   'panel.retry': 'Try again',
   'panel.imagesLoading': 'Looking for images',
   'panel.openImage': 'Open image',
@@ -186,6 +192,8 @@ export const en = {
   'settings.storyDetailDesc': 'Fan wikis and the English Wikipedia often tell a story at several times the length of a summary.',
   'settings.detail.complete': 'The most complete telling (may be in English)',
   'settings.detail.local': 'Prefer my language, even if shorter',
+  'settings.autoTranslate': 'Translate stories automatically',
+  'settings.autoTranslateDesc': 'When the fullest version of a story is in another language, it is translated with Google Translate. Machine translation can make mistakes, and you can always switch to the original.',
   'settings.lang.auto': 'Same as interface',
   'settings.sources': 'Sources',
   'settings.sourcesDesc': 'Used by every engine for plots, posters, cast and links.',
@@ -245,7 +253,8 @@ export const en = {
   'common.settings': 'Settings',
   'common.chapter': 'Chapter',
   'common.eps': '{n} ep.',
-  'common.generatedBy': 'Made with Storyteller'
+  'common.generatedBy': 'Made with Storyteller',
+  'export.translated': 'Machine-translated from {lang} with Google Translate.'
 }
 
 export type MessageKey = keyof typeof en
