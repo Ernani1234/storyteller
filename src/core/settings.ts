@@ -12,8 +12,9 @@ export const DEFAULT_SETTINGS: Settings = {
   uiLanguage: 'en',
   readingFont: 'sans',
   textScale: 1,
-  spoilerShield: false,
+  spoilerShield: true,
   storyDetail: 'complete',
+  mapLayout: 'vertical',
   sources: { wikipedia: true, fandom: true, tvmaze: true, anilist: true },
   onboarded: false
 }
@@ -57,6 +58,7 @@ export function sanitizePatch(patch: SettingsPatch): SettingsPatch {
   if (typeof patch.textScale === 'number') out.textScale = Math.min(1.4, Math.max(0.85, patch.textScale))
   if (typeof patch.spoilerShield === 'boolean') out.spoilerShield = patch.spoilerShield
   if (patch.storyDetail === 'complete' || patch.storyDetail === 'local') out.storyDetail = patch.storyDetail
+  if (patch.mapLayout === 'vertical' || patch.mapLayout === 'compact') out.mapLayout = patch.mapLayout
   if (typeof patch.onboarded === 'boolean') out.onboarded = patch.onboarded
   if (patch.sources && typeof patch.sources === 'object') {
     const s = patch.sources

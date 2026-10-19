@@ -4,7 +4,7 @@ import { ENGINE_ICON } from './EngineSwitch'
 import { themes, applyAppearance, SYSTEM_THEME } from '../themes'
 import { useI18n } from '../i18n'
 import { UI_LANGUAGES, UI_LANGUAGE_NAMES, UI_LANGUAGE_TAGS } from '../../../shared/languages'
-import type { DataInfo, Engine, PublicSettings, SettingsPatch, SourceToggles, UiLanguage } from '../../../shared/types'
+import type { DataInfo, Engine, MapLayout, PublicSettings, SettingsPatch, SourceToggles, UiLanguage } from '../../../shared/types'
 
 export type SettingsSection = 'appearance' | 'engine' | 'ai' | 'data'
 
@@ -101,6 +101,7 @@ export default function SettingsModal({ settings, section: initial, onClose, onS
       textScale: draft.textScale,
       spoilerShield: draft.spoilerShield,
       storyDetail: draft.storyDetail,
+      mapLayout: draft.mapLayout,
       sources: draft.sources
     }
     if (keyInput.trim()) patch.apiKey = keyInput.trim()
@@ -177,6 +178,13 @@ export default function SettingsModal({ settings, section: initial, onClose, onS
                     <select className="input" value={draft.readingFont} onChange={(e) => set('readingFont', e.target.value as PublicSettings['readingFont'])}>
                       <option value="sans">{t('settings.font.sans')}</option>
                       <option value="serif">{t('settings.font.serif')}</option>
+                    </select>
+                  </label>
+                  <label className="field field--wide">
+                    <span className="field__label">{t('settings.mapLayout')}</span>
+                    <select className="input" value={draft.mapLayout} onChange={(e) => set('mapLayout', e.target.value as MapLayout)}>
+                      <option value="vertical">{t('settings.mapLayout.vertical')}</option>
+                      <option value="compact">{t('settings.mapLayout.compact')}</option>
                     </select>
                   </label>
                   <label className="field field--wide">

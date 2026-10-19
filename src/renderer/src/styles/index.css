@@ -1483,6 +1483,16 @@ input[type='range']::-webkit-slider-thumb {
 .react-flow__controls-button svg {
   fill: var(--text-soft);
 }
+/* Our stroke icon, not React Flow's filled glyphs. */
+.react-flow__controls-button.layout-toggle svg {
+  fill: none;
+  stroke: var(--text-soft);
+  max-width: 16px;
+  max-height: 16px;
+}
+.react-flow__controls-button.layout-toggle:hover svg {
+  stroke: var(--accent-ink);
+}
 .react-flow__minimap {
   background: var(--bg-elev);
   border: 1px solid var(--border);

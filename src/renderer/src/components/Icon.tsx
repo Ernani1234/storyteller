@@ -76,6 +76,24 @@ const PATHS = {
       <rect x="2" y="6" width="20" height="12" rx="2" />
       <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10" />
     </>
+  ),
+  /** story map as one column */
+  column: (
+    <>
+      <rect x="6" y="2.5" width="12" height="6" rx="1.5" />
+      <rect x="6" y="15.5" width="12" height="6" rx="1.5" />
+      <path d="M12 8.5v7" />
+    </>
+  ),
+  /** story map as a zig-zag grid */
+  zigzag: (
+    <>
+      <rect x="2.5" y="3.5" width="7" height="6" rx="1.5" />
+      <rect x="14.5" y="3.5" width="7" height="6" rx="1.5" />
+      <rect x="14.5" y="14.5" width="7" height="6" rx="1.5" />
+      <rect x="2.5" y="14.5" width="7" height="6" rx="1.5" />
+      <path d="M9.5 6.5h5M18 9.5v5M14.5 17.5h-5" />
+    </>
   )
 }
 

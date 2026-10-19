@@ -201,13 +201,18 @@ function chunksFromParts(intro: string, parts: { title: string; text: string; im
   const usable = parts.filter((p) => wordCount(p.text) >= 15)
 
   if (usable.length >= 2) {
+    // Chapter size follows the story's length: ~180 words for a 1,000-word
+    // plot, up to ~350 for long ones. A flat 350 left short stories (Fallout 4:
+    // "Setting" + "Plot") with two or three long chapters.
+    const total = usable.reduce((n, p) => n + wordCount(p.text), 0)
+    const target = Math.min(350, Math.max(180, Math.round(total / 9)))
     if (wordCount(intro) >= 40) chunks.push({ title: L.prologue, text: splitParagraphs(intro).join('\n\n'), images: introImages })
     for (const p of usable) {
       const words = wordCount(p.text)
       const paras = splitParagraphs(p.text)
-      if (words > 650) {
+      if (words > target * 1.85) {
         // Long section: split it, naming each piece by who/where it is about.
-        const sub = segmentParagraphs(paras, Math.ceil(words / 350), 350).map(leadLabel)
+        const sub = segmentParagraphs(paras, Math.ceil(words / target), target).map(leadLabel)
         const texts = sub.map((s) => s.text)
         const prefix = GENERIC_PART.test(p.title.trim()) ? '' : `${p.title} · `
         sub.forEach(({ label, text }, i) => {

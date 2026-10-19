@@ -17,7 +17,7 @@ export interface StoryNodeData {
 }
 
 export const NODE_W = 240
-const NODE_H = 150
+export const NODE_H = 150
 const X_GAP = 64
 const TREE_Y_GAP = 180
 const ROW_GAP = 70
@@ -63,9 +63,10 @@ function treePositions(outline: StoryOutline): Map<string, Placed> {
 }
 
 /**
- * Serpentine layout for linear stories: a long chain read left→right, then
- * right→left on the next row, like a board game path. Fits a 15-chapter story
- * on one screen instead of a 2,500px-tall column.
+ * Layout for stories without branches. One column (maxColumns 1) is the
+ * default: it reads top to bottom like a table of contents. The compact
+ * option snakes left→right, then right→left on the next row, like a board
+ * game path, which fits a 15-chapter story on one screen.
  */
 function snakePositions(order: StoryNode[], maxColumns = 5): { pos: Map<string, Placed>; cols: number } {
   const n = order.length
@@ -80,17 +81,25 @@ function snakePositions(order: StoryNode[], maxColumns = 5): { pos: Map<string, 
   return { pos, cols }
 }
 
-export function layoutOutline(
-  outline: StoryOutline,
-  opts: LayoutOptions
-): { nodes: Node<StoryNodeData>[]; edges: Edge[] } {
+export interface Layout {
+  nodes: Node<StoryNodeData>[]
+  edges: Edge[]
+  /** no branches: the map can be drawn as one column or as a zig-zag grid. */
+  chain: boolean
+  /** drawn as a single column, read top to bottom. */
+  column: boolean
+}
+
+export function layoutOutline(outline: StoryOutline, opts: LayoutOptions): Layout {
   const order = readingOrder(outline.nodes)
-  if (!order.length) return { nodes: [], edges: [] }
+  if (!order.length) return { nodes: [], edges: [], chain: false, column: false }
   const indexOf = new Map(order.map((n, i) => [n.id, i]))
   const kids = childrenMap(outline.nodes)
   const isChain = outline.nodes.every((n) => (kids.get(n.id)?.length ?? 0) <= 1)
   const snake = isChain && (order.length > 4 || opts.maxColumns === 1)
   const { pos, cols } = snake ? snakePositions(order, opts.maxColumns) : { pos: treePositions(outline), cols: 0 }
+  // A short chain laid out as a tree is a column too.
+  const column = isChain && (cols === 1 || !snake)
 
   const nodes: Node<StoryNodeData>[] = order.map((n) => {
     const p = pos.get(n.id) ?? { x: 0, y: 0 }
@@ -153,5 +162,5 @@ export function layoutOutline(
         className: edgeClass(n.parentId!, n.id)
       }))
   }
-  return { nodes, edges }
+  return { nodes, edges, chain: isChain, column }
 }
